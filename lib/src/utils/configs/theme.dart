@@ -20,16 +20,16 @@ class AppTheme {
   ///Default Theme
   static final ThemeModel defaultTheme = ThemeModel.fromJson({
     "name": "default",
-    "primary": '#2c99ff',
-    "secondary": "#FFFFFF",
+    "primary": '#e30613',
+    "secondary": "#979797",
   });
 
   ///List Theme Support in Application
   static final List themeSupport = [
     {
       "name": "default",
-      "primary": '#2c99ff',
-      "secondary": "#FFFFFF",
+      "primary": '#e30613',
+      "secondary": "#979797",
     },
     {
       "name": "green",

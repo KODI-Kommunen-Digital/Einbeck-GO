@@ -34,7 +34,7 @@
               "client_id": "660123882783-3gi7uh3v72s0e46p3dmr5k1l3cs1tur5.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.smartregion"
+                "bundle_id": "com.einbeck"
               }
             }
           ]
@@ -45,7 +45,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:660123882783:android:aef1ebe54aadc718b1cc2a",
         "android_client_info": {
-          "package_name": "com.smartauf"
+          "package_name": "com.einbeck"
         }
       },
       "oauth_client": [
@@ -70,7 +70,7 @@
               "client_id": "660123882783-3gi7uh3v72s0e46p3dmr5k1l3cs1tur5.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.smartregion"
+                "bundle_id": "com.einbeck"
               }
             }
           ]
@@ -81,7 +81,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:660123882783:android:8259bab2e595c4fbb1cc2a",
         "android_client_info": {
-          "package_name": "com.smartregionauf"
+          "package_name": "com.einbeck"
         }
       },
       "oauth_client": [
@@ -106,7 +106,7 @@
               "client_id": "660123882783-3gi7uh3v72s0e46p3dmr5k1l3cs1tur5.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.smartregion"
+                "bundle_id": "com.einbeck"
               }
             }
           ]

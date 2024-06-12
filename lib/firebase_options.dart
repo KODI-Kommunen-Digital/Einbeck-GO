@@ -64,6 +64,6 @@ class DefaultFirebaseOptions {
     projectId: 'smart-region-1ce64',
     storageBucket: 'smart-region-1ce64.appspot.com',
     iosClientId: '660123882783-3gi7uh3v72s0e46p3dmr5k1l3cs1tur5.apps.googleusercontent.com',
-    iosBundleId: 'com.smartregion',
+    iosBundleId: 'com.einbeck',
   );
 }
