@@ -982,11 +982,12 @@ class _AddListingScreenState extends State<AddListingScreen> {
                 )
               ],
             ),
-            if (selectedCategory?.toLowerCase() == "news" ||
-                selectedCategory == null)
+            if ((selectedCategory?.toLowerCase() == "news" ||
+                selectedCategory == null) && selectedSubCategory != null)
               const SizedBox(height: 8),
-            if (selectedCategory?.toLowerCase() == "news" ||
-                selectedCategory == null)
+            if ((selectedCategory?.toLowerCase() == "news" ||
+                    selectedCategory == null) &&
+                selectedSubCategory != null)
               Text.rich(
                 TextSpan(
                   text: Translate.of(context).translate('subCategory'),
@@ -1008,7 +1009,8 @@ class _AddListingScreenState extends State<AddListingScreen> {
             const SizedBox(height: 8),
             Row(
               children: [
-                if (selectedCategory?.toLowerCase() == "news")
+                if (selectedCategory?.toLowerCase() == "news" &&
+                    selectedSubCategory != null)
                   Expanded(
                     child: listSubCategory.isEmpty
                         ? const LinearProgressIndicator()
@@ -1545,13 +1547,20 @@ class _AddListingScreenState extends State<AddListingScreen> {
     context
         .read<AddListingCubit>()
         .setCategoryId(selectedCategory.toLowerCase());
-    context
-        .read<AddListingCubit>()
-        .setSubCategoryId(subCategoryResponse?.data.last['name']);
+    if (subCategoryResponse?.data.isNotEmpty) {
+      context
+          .read<AddListingCubit>()
+          .setSubCategoryId(subCategoryResponse?.data.last['name']);
+    }
+
     setState(() {
       listSubCategory = subCategoryResponse!.data;
 
-      selectedSubCategory = subCategoryResponse.data.last['name'];
+      if (subCategoryResponse.data.isNotEmpty) {
+        selectedSubCategory = subCategoryResponse.data.last['name'];
+      } else {
+        selectedSubCategory = null;
+      }
     });
   }
 }
