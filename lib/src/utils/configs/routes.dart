@@ -28,6 +28,7 @@ import 'package:heidi/src/presentation/main/account/profile_settings/profile_set
 import 'package:heidi/src/presentation/main/account/setting/settings_screen.dart';
 import 'package:heidi/src/presentation/main/add_listing/add_listing_screen.dart';
 import 'package:heidi/src/presentation/main/add_listing/add_listing_success/add_listing_success.dart';
+import 'package:heidi/src/presentation/main/discovery/discovery_screen_detail.dart';
 import 'package:heidi/src/presentation/main/home/filter_screen.dart';
 import 'package:heidi/src/presentation/main/home/forum/add_group_screen/add_group_screen.dart';
 import 'package:heidi/src/presentation/main/home/forum/add_group_screen/cubit/add_group_cubit.dart';
@@ -64,6 +65,7 @@ class Routes {
   static const String home = "/home";
   static const String main = "/home";
   static const String discovery = "/discovery";
+  static const String discoveryDetail = "/discoveryDetail";
   static const String wishList = "/wishList";
   static const String account = "/account";
   static const String signIn = "/signIn";
@@ -499,9 +501,16 @@ class Routes {
           builder: (context) {
             final Map<String, dynamic> arguments =
                 settings.arguments as Map<String, dynamic>;
-            return FilterScreen(
-              multiFilter: arguments["multifilter"]
-            );
+            return FilterScreen(multiFilter: arguments["multifilter"]);
+          },
+        );
+
+      case discoveryDetail:
+        return MaterialPageRoute(
+          builder: (context) {
+            final Map<String, dynamic> arguments =
+                settings.arguments as Map<String, dynamic>;
+            return DiscoveryScreenDetail(arguments: arguments);
           },
         );
 

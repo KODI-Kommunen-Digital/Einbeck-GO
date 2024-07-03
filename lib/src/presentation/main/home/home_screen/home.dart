@@ -25,13 +25,14 @@ import 'package:heidi/src/utils/logging/loggy_exp.dart';
 import 'package:heidi/src/utils/translate.dart';
 import 'package:upgrader/upgrader.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import 'cubit/home_cubit.dart';
 import 'cubit/home_state.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -252,7 +253,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         String? minAppVersion}) {
                       if (display != null) {
                         setState(() {
-                          latestAppStoreVersion = appStoreVersion ?? '2.4.4';
+                          latestAppStoreVersion = appStoreVersion ?? '1.0.0';
                         });
                       }
                     },
@@ -363,10 +364,9 @@ class _HomeScreenState extends State<HomeScreen> {
     String? searchRequest = await showDialog(
       context: context,
       builder: (BuildContext context) {
-        return WillPopScope(
-          onWillPop: () async {
+        return PopScope(
+          onPopInvoked: (pop) async {
             Navigator.pop(context, searchTerm);
-            return false;
           },
           child: SimpleDialog(
               title: Center(
@@ -508,6 +508,22 @@ class _HomeScreenState extends State<HomeScreen> {
           if (!mounted) return;
           _showCitySelectionPopup(context);
         }
+      } else if (item.id == 14) {
+        await Navigator.pushNamed(context, Routes.discoveryDetail, arguments: {
+          'id': 14,
+        });
+      } else if (item.id == 15) {
+        await Navigator.pushNamed(context, Routes.discoveryDetail, arguments: {
+          'id': 15,
+        });
+      } else if (item.id == 16) {
+        await Navigator.pushNamed(context, Routes.discoveryDetail, arguments: {
+          'id': 16,
+        });
+      } else if (item.id == 18) {
+        await launchUrl(
+            Uri.parse('https://pages.et4.de/de/einbeck/wlan/portal'),
+            mode: LaunchMode.inAppWebView);
       } else {
         final prefs = await Preferences.openBox();
         prefs.setKeyValue(Preferences.categoryId, item.id);

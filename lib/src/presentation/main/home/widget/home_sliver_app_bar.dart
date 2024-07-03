@@ -12,11 +12,11 @@ class AppBarHomeSliver extends SliverPersistentHeaderDelegate {
 
   AppBarHomeSliver(
       {required this.expandedHeight,
-        required this.setLocationCallback,
-        required this.cityTitlesList,
-        this.banners,
-        this.hintText,
-        this.selectedOption});
+      required this.setLocationCallback,
+      required this.cityTitlesList,
+      this.banners,
+      this.hintText,
+      this.selectedOption});
 
   @override
   Widget build(context, shrinkOffset, overlapsContent) {
@@ -29,7 +29,7 @@ class AppBarHomeSliver extends SliverPersistentHeaderDelegate {
         ),
         Container(
           height: 32,
-          color: Theme.of(context).colorScheme.background,
+          color: Theme.of(context).colorScheme.surface,
         ),
         CitiesDropDown(
           hintText: hintText,

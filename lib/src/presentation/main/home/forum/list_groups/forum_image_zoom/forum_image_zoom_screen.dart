@@ -6,8 +6,7 @@ import 'package:photo_view/photo_view.dart';
 class ForumImageZoomScreen extends StatelessWidget {
   final String imageUrl;
 
-  const ForumImageZoomScreen({Key? key, required this.imageUrl})
-      : super(key: key);
+  const ForumImageZoomScreen({super.key, required this.imageUrl});
 
   @override
   Widget build(BuildContext context) {

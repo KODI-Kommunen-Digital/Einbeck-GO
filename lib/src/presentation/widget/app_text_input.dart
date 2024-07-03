@@ -23,7 +23,7 @@ class AppTextInput extends StatefulWidget {
   final bool hasDelete;
 
   const AppTextInput(
-      {Key? key,
+      {super.key,
       this.hintText,
       this.controller,
       this.focusNode,
@@ -41,8 +41,7 @@ class AppTextInput extends StatefulWidget {
       this.maxLength,
       this.readOnly = false,
       this.hasDelete = true,
-      this.autofillHint})
-      : super(key: key);
+      this.autofillHint});
 
   @override
   State<AppTextInput> createState() => _AppTextInputState();
@@ -113,7 +112,9 @@ class _AppTextInputState extends State<AppTextInput> {
       );
     }
 
-    if (widget.controller != null && widget.controller!.text.isNotEmpty && widget.hasDelete) {
+    if (widget.controller != null &&
+        widget.controller!.text.isNotEmpty &&
+        widget.hasDelete) {
       deleteAction = Row(
         mainAxisSize: MainAxisSize.min,
         children: [

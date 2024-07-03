@@ -19,14 +19,14 @@ class CommentsBottomSheet extends StatefulWidget {
   final String userImage;
 
   const CommentsBottomSheet({
-    Key? key,
+    super.key,
     required this.forumId,
     required this.postId,
     required this.comments,
     required this.postDetailCubit,
     required this.userProfileImage,
     required this.userImage,
-  }) : super(key: key);
+  });
 
   @override
   CommentsBottomSheetState createState() => CommentsBottomSheetState();
@@ -173,12 +173,12 @@ class CommentWidget extends StatefulWidget {
   final bool isAddingReply;
 
   const CommentWidget({
-    Key? key,
+    super.key,
     required this.comment,
     required this.postDetailCubit,
     required this.toggleAddingReply,
     required this.isAddingReply,
-  }) : super(key: key);
+  });
 
   @override
   CommentWidgetState createState() => CommentWidgetState();

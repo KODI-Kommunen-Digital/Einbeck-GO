@@ -39,25 +39,23 @@ class _FilterScreenState extends State<FilterScreen> {
         title: const Text("Filter"),
       ),
       body: SingleChildScrollView(
-        child: WillPopScope(
-          onWillPop: () async {
+        child: PopScope(
+          onPopInvoked: (pop) async {
             Navigator.pop(
                 context,
                 MultiFilter(
-                  currentLocation: currentCity,
-                  currentProductEventFilter: currentProductEventFilter,
-                  currentListingStatus: currentListingStatus,
-                  currentForumGroupFilter: currentForumGroupFilter,
-                  currentCategory: currentCategory,
-                  hasForumGroupFilter: widget.multiFilter.hasForumGroupFilter,
-                  hasProductEventFilter:
-                      widget.multiFilter.hasProductEventFilter,
-                  hasLocationFilter: widget.multiFilter.hasLocationFilter,
-                  hasListingStatusFilter:
-                      widget.multiFilter.hasListingStatusFilter,
-                  hasCategoryFilter: widget.multiFilter.hasCategoryFilter
-                ));
-            return false;
+                    currentLocation: currentCity,
+                    currentProductEventFilter: currentProductEventFilter,
+                    currentListingStatus: currentListingStatus,
+                    currentForumGroupFilter: currentForumGroupFilter,
+                    currentCategory: currentCategory,
+                    hasForumGroupFilter: widget.multiFilter.hasForumGroupFilter,
+                    hasProductEventFilter:
+                        widget.multiFilter.hasProductEventFilter,
+                    hasLocationFilter: widget.multiFilter.hasLocationFilter,
+                    hasListingStatusFilter:
+                        widget.multiFilter.hasListingStatusFilter,
+                    hasCategoryFilter: widget.multiFilter.hasCategoryFilter));
           },
           child: Column(
             children: [
@@ -113,7 +111,7 @@ class _FilterScreenState extends State<FilterScreen> {
                 });
               },
             );
-          }).toList(),
+          }),
         ]),
       )
     ];
@@ -323,12 +321,12 @@ class _FilterScreenState extends State<FilterScreen> {
       ),
       Center(
           child: Text(
-            Translate.of(context).translate('input_category'),
-            style: Theme.of(context)
-                .textTheme
-                .titleMedium!
-                .copyWith(fontWeight: FontWeight.bold),
-          )),
+        Translate.of(context).translate('input_category'),
+        style: Theme.of(context)
+            .textTheme
+            .titleMedium!
+            .copyWith(fontWeight: FontWeight.bold),
+      )),
       Container(
         padding: const EdgeInsets.all(8.0),
         child: Wrap(spacing: 8.0, children: [
@@ -351,7 +349,7 @@ class _FilterScreenState extends State<FilterScreen> {
                 });
               },
             );
-          }).toList(),
+          }),
         ]),
       )
     ];

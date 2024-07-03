@@ -13,6 +13,19 @@ class Images {
   static const String service10 = "assets/images/services-10.png";
   static const String service13 = "assets/images/services-13.png";
   static const String service14 = "assets/images/services-14.png";
+  static const String service14_1 = "assets/images/services-14-1.png";
+  static const String service14_2 = "assets/images/services-14-2.png";
+  static const String service14_3 = "assets/images/services-14-3.png";
+  static const String service15 = "assets/images/services-15.png";
+  static const String service15_1 = "assets/images/services-15-1.png";
+  static const String service15_2 = "assets/images/services-15-2.png";
+  static const String service15_3 = "assets/images/services-15-3.png";
+  static const String service16 = "assets/images/services-16.png";
+  static const String service16_1 = "assets/images/services-16-1.png";
+  static const String service16_2 = "assets/images/services-16-2.png";
+  static const String service16_3 = "assets/images/services-16-3.png";
+  static const String service17 = "assets/images/services-17.png";
+
   static const String defaultListing = "assets/images/default_image.jpeg";
 
   ///Singleton factory

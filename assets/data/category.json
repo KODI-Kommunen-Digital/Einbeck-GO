@@ -2,14 +2,6 @@
     "status": "success",
     "data": [ 
         {
-            "id": 17,
-            "name": "Gruppen",
-            "noOfSubcategories": 8,
-            "icon": "fas fa-user-group",
-            "color": "#5A5A5A",
-            "categoryType" : "category"
-            },
-        {
             "id": 1,
             "name": "News",
             "noOfSubcategories": 8,
@@ -17,61 +9,20 @@
             "color": "#ff8a65",
             "categoryType" : "category"
         },
-        
+        {
+            "id": 17,
+            "name": "Gruppen",
+            "noOfSubcategories": 8,
+            "icon": "fas fa-user-group",
+            "color": "#5A5A5A",
+            "categoryType" : "category"
+        },
         {
             "id": 3,
             "name": "Events",
             "noOfSubcategories": 0,
             "icon": "far fa-calendar-check",
             "color": "#a569bd",
-            "categoryType" : "category"
-        },
-        {
-            "id": 4,
-            "name": "Vereine",
-            "noOfSubcategories": 0,
-            "icon": "far fa-handshake",
-            "color": "#5dade2",
-            "categoryType" : "category"
-        },
-        {
-            "id": 5,
-            "name": "Regionale Produkte",
-            "noOfSubcategories": 0,                
-            "icon": "fas fa-cart-shopping",
-            "color": "#4a90a4",
-            "categoryType" : "category"
-        },
-        {
-            "id": 6,
-            "name": "Suche/Biete",
-            "noOfSubcategories": 0,
-            "icon": "fas fa-magnifying-glass",
-            "color": "#58d68d",
-            "categoryType" : "category"
-        },
-        {
-            "id": 9,
-            "name": "Fundbüro",
-            "noOfSubcategories": 0,
-            "icon": "fas fa-search",
-            "color": "#58d68d",
-            "categoryType" : "category"
-        },
-        {
-            "id": 10,
-            "name": "Unternehmen",
-            "noOfSubcategories": 0,
-            "icon": "fas fa-briefcase",
-            "color": "#fdc60a",
-            "categoryType" : "category"
-        },
-        {
-            "id": 11,
-            "name": "Mitfahrbank",
-            "noOfSubcategories": 0,
-            "icon": "fas fa-bus",
-            "color": "#ff8a65",
             "categoryType" : "category"
         },
         {
@@ -84,26 +35,42 @@
         },
         {
             "id": 14,
-            "name": "Rathaus",
+            "name": "Online Rathaus",
             "noOfSubcategories": 0,
             "icon": "fas fa-building",
-            "color": "#58d68d",
+            "color": "#58A4B0",
             "categoryType" : "category"
         },
         {
             "id": 15,
-            "name": "Mitteilungsblatt",
+            "name": "Mitmachen",
             "noOfSubcategories": 0,
-            "icon": "fas fa-newspaper",
+            "icon": "fas fa-ticket-simple",
+            "color": "#FFCA3A",
+            "categoryType" : "category"
+        },
+        {
+            "id": 18,
+            "name": "Freizeit & Tourismus",
+            "noOfSubcategories": 0,
+            "icon": "fas fa-umbrella-beach",
+            "color": "#C19AB7",
+            "categoryType" : "category"
+        },
+        {
+            "id": 6,
+            "name": "Suche/Biete",
+            "noOfSubcategories": 0,
+            "icon": "fas fa-magnifying-glass",
             "color": "#58d68d",
             "categoryType" : "category"
         },
         {
             "id": 16,
-            "name": "Amtliche Mitteilungen",
+            "name": "Abfallkalender",
             "noOfSubcategories": 0,
-            "icon": "fas fa-newspaper",
-            "color": "#58d68d",
+            "icon": "fas fa-trash",
+            "color": "#81C14B",
             "categoryType" : "category"
         }
     ]

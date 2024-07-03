@@ -20,22 +20,31 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
   bool doesScroll = false;
   int? currentCity;
 
-  Future<void> onLoad() async {
+  Future<void> onLoad(int id) async {
     emit(const DiscoveryState.loading());
     final cityRequestResponse = await Api.requestCities();
     location = List.from(cityRequestResponse.data ?? []).map((item) {
       return CategoryModel.fromJson(item);
     }).toList();
-    services = initializeServices();
+    if (id == 1) {
+      services = initializeServices();
+    } else if (id == 14) {
+      services = initializeServices14();
+    } else if (id == 15) {
+      services = initializeServices15();
+    } else if (id == 16) {
+      services = initializeServices16();
+    }
+    // services = initializeServices();
 
     List<CitizenServiceModel> servicesCopy = List.from(services);
 
     for (var element in servicesCopy) {
       if (element.categoryId != null || element.type == "subCategoryService") {
-        bool hasContent = await element.hasContent();
-        if (!hasContent) {
-          hiddenServices.add(element);
-        }
+        // bool hasContent = await element.hasContent();
+        // if (!hasContent) {
+        //   hiddenServices.add(element);
+        // }
       }
     }
 
@@ -52,7 +61,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
   Future<void> onLocationFilter(int locationId, bool calledExternal) async {
     await saveCityId(locationId);
     emit(const DiscoveryState.loading());
-    await onLoad();
+    await onLoad(1);
     if (calledExternal) {
       AppBloc.homeCubit.setCalledExternally(true);
       await AppBloc.homeCubit.onLoad(false);
@@ -114,45 +123,122 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
           arguments: 4,
           categoryId: 1),
       CitizenServiceModel(
+        imageUrl: Images.service10,
+        imageLink: "10",
+        arguments: 10,
+      ),
+      CitizenServiceModel(
           imageUrl: Images.service5,
           imageLink: "5",
           arguments: 5,
           categoryId: 3),
-      CitizenServiceModel(
-          imageUrl: Images.service6,
-          imageLink: "6",
-          arguments: 6,
-          categoryId: 4),
-      CitizenServiceModel(
-          imageUrl: Images.service7,
-          imageLink: "7",
-          arguments: 7,
-          categoryId: 10),
       CitizenServiceModel(
           imageUrl: Images.service8,
           imageLink: "8",
           arguments: 8,
           categoryId: 13),
       CitizenServiceModel(
+          imageUrl: Images.service14,
+          imageLink: "14",
+          categoryId: 14,
+          arguments: 0),
+      CitizenServiceModel(
+          imageUrl: Images.service15,
+          imageLink: "15",
+          categoryId: 15,
+          arguments: 0),
+
+      CitizenServiceModel(
+          imageUrl: Images.service17,
+          imageLink: "17",
+          arguments: 9,
+          categoryId: 0),
+      CitizenServiceModel(
           imageUrl: Images.service9,
           imageLink: "9",
           arguments: 9,
           categoryId: 6),
       CitizenServiceModel(
-        imageUrl: Images.service10,
-        imageLink: "10",
-        arguments: 10,
-      ),
+          imageUrl: Images.service16,
+          imageLink: "16",
+          arguments: 9,
+          categoryId: 0),
+      // CitizenServiceModel(
+      //     imageUrl: Images.service6,
+      //     imageLink: "6",
+      //     arguments: 6,
+      //     categoryId: 4),
+      // CitizenServiceModel(
+      //     imageUrl: Images.service7,
+      //     imageLink: "7",
+      //     arguments: 7,
+      //     categoryId: 10),
+
+      // CitizenServiceModel(
+      //     imageUrl: Images.service13,
+      //     imageLink: "13",
+      //     categoryId: 15,
+      //     arguments: 0),
+    ];
+  }
+
+  List<CitizenServiceModel> initializeServices14() {
+    return [
       CitizenServiceModel(
-          imageUrl: Images.service13,
-          imageLink: "13",
-          categoryId: 15,
-          arguments: 0),
-      CitizenServiceModel(
-          imageUrl: Images.service14,
+          imageUrl: Images.service14_1,
           imageLink: "14",
-          categoryId: 14,
-          arguments: 0),
+          arguments: 141,
+          categoryId: 0),
+      CitizenServiceModel(
+          imageUrl: Images.service14_2,
+          imageLink: "14",
+          arguments: 142,
+          categoryId: 0),
+      CitizenServiceModel(
+          imageUrl: Images.service14_3,
+          imageLink: "14",
+          categoryId: 0,
+          arguments: 143),
+    ];
+  }
+
+  List<CitizenServiceModel> initializeServices15() {
+    return [
+      CitizenServiceModel(
+          imageUrl: Images.service15_1,
+          imageLink: "15",
+          arguments: 151,
+          categoryId: 0),
+      CitizenServiceModel(
+          imageUrl: Images.service15_2,
+          imageLink: "15",
+          arguments: 152,
+          categoryId: 0),
+      CitizenServiceModel(
+          imageUrl: Images.service15_3,
+          imageLink: "15",
+          categoryId: 0,
+          arguments: 153),
+    ];
+  }
+
+  List<CitizenServiceModel> initializeServices16() {
+    return [
+      CitizenServiceModel(
+          imageUrl: Images.service16_1,
+          imageLink: "16",
+          arguments: 161,
+          categoryId: 0),
+      CitizenServiceModel(
+          imageUrl: Images.service16_2,
+          imageLink: "16",
+          arguments: 162,
+          categoryId: 0),
+      CitizenServiceModel(
+          imageUrl: Images.service16_3,
+          imageLink: "16",
+          categoryId: 0,
+          arguments: 163),
     ];
   }
 

@@ -29,8 +29,8 @@ class HTTPManager {
     _dio = Dio(
       BaseOptions(
         baseUrl: _baseUrl,
-        connectTimeout: 30000,
-        receiveTimeout: 30000,
+        connectTimeout: const Duration(milliseconds: 30000),
+        receiveTimeout: const Duration(milliseconds: 30000),
         contentType: Headers.formUrlEncodedContentType,
         responseType: ResponseType.json,
       ),
@@ -132,7 +132,7 @@ class HTTPManager {
         },
       );
       return response.data;
-    } on DioError catch (error, stackTrace) {
+    } on DioException catch (error, stackTrace) {
       await Sentry.captureException(error, stackTrace: stackTrace);
       return _errorHandle(error);
     } finally {
@@ -162,7 +162,7 @@ class HTTPManager {
         cancelToken: cancelToken,
       );
       return response.data;
-    } on DioError catch (error, stackTrace) {
+    } on DioException catch (error, stackTrace) {
       await Sentry.captureException(error, stackTrace: stackTrace);
       return _errorHandle(error);
     } finally {
@@ -196,7 +196,7 @@ class HTTPManager {
         },
       );
       return response.data;
-    } on DioError catch (error, stackTrace) {
+    } on DioException catch (error, stackTrace) {
       await Sentry.captureException(error, stackTrace: stackTrace);
       return _errorHandle(error);
     } finally {
@@ -223,7 +223,7 @@ class HTTPManager {
         options: options,
       );
       return response.data;
-    } on DioError catch (error, stackTrace) {
+    } on DioException catch (error, stackTrace) {
       await Sentry.captureException(error, stackTrace: stackTrace);
       return _errorHandle(error);
     } finally {
@@ -268,7 +268,7 @@ class HTTPManager {
         "success": false,
         "message": 'download_fail',
       };
-    } on DioError catch (error, stackTrace) {
+    } on DioException catch (error, stackTrace) {
       await Sentry.captureException(error, stackTrace: stackTrace);
       return _errorHandle(error);
     } finally {
@@ -290,13 +290,13 @@ class HTTPManager {
   }
 
   ///Error common handle
-  Map<String, dynamic> _errorHandle(DioError error) {
+  Map<String, dynamic> _errorHandle(DioException error) {
     String message = "unknown_error";
     Map<String, dynamic> data = {};
 
     switch (error.type) {
-      case DioErrorType.sendTimeout:
-      case DioErrorType.receiveTimeout:
+      case DioExceptionType.sendTimeout:
+      case DioExceptionType.receiveTimeout:
         message = "request_time_out";
         break;
 

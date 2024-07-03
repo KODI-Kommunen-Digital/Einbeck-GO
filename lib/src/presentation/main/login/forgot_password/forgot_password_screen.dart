@@ -7,7 +7,7 @@ import 'package:heidi/src/utils/translate.dart';
 import 'package:heidi/src/utils/validate.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
-  const ForgotPasswordScreen({Key? key}) : super(key: key);
+  const ForgotPasswordScreen({super.key});
 
   @override
   State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
@@ -52,16 +52,15 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       final result = await AppBloc.forgotPasswordCubit.onForgotPassword(
         textUserNameController.text,
       );
-        if (result.success) {
-          _showSuccessSnackBar();
-          if (!mounted) return;
-          Navigator.pop(context);
-        }
-        else{
-            if(!mounted) return;
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content:
-                Text(Translate.of(context).translate("username_does_not_exist"))));
+      if (result.success) {
+        _showSuccessSnackBar();
+        if (!mounted) return;
+        Navigator.pop(context);
+      } else {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(
+                Translate.of(context).translate("username_does_not_exist"))));
       }
     }
   }

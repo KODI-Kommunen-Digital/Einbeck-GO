@@ -18,7 +18,7 @@ class CommentInputWidget extends StatefulWidget {
   final String? userImage;
 
   const CommentInputWidget({
-    Key? key,
+    super.key,
     required this.forumId,
     required this.postId,
     required this.commentController,
@@ -29,7 +29,7 @@ class CommentInputWidget extends StatefulWidget {
     required this.userImage,
     required this.postDetailCubit,
     this.onCommentAdded,
-  }) : super(key: key);
+  });
 
   @override
   CommentInputWidgetState createState() => CommentInputWidgetState();

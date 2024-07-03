@@ -15,7 +15,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'cubit/cubit.dart';
 
 class DiscoveryScreen extends StatefulWidget {
-  const DiscoveryScreen({Key? key}) : super(key: key);
+  const DiscoveryScreen({super.key});
 
   @override
   State<DiscoveryScreen> createState() => _DiscoveryScreenState();
@@ -32,7 +32,7 @@ class _DiscoveryScreenState extends State<DiscoveryScreen> {
   }
 
   Future<void> loadLocationList() async {
-    await context.read<DiscoveryCubit>().onLoad();
+    await context.read<DiscoveryCubit>().onLoad(1);
   }
 
   Future<void> loadSelectedLocation() async {
@@ -100,7 +100,7 @@ class _DiscoveryScreenState extends State<DiscoveryScreen> {
 }
 
 class DiscoveryLoading extends StatelessWidget {
-  const DiscoveryLoading({Key? key}) : super(key: key);
+  const DiscoveryLoading({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -114,9 +114,9 @@ class DiscoveryLoaded extends StatefulWidget {
   final List<CitizenServiceModel> services;
 
   const DiscoveryLoaded({
-    Key? key,
+    super.key,
     required this.services,
-  }) : super(key: key);
+  });
 
   @override
   State<DiscoveryLoaded> createState() => _DiscoveryLoadedState();
@@ -191,6 +191,21 @@ class _DiscoveryLoadedState extends State<DiscoveryLoaded> {
         if (!mounted) return;
         _showCitySelectionPopup(context);
       }
+    } else if (service.imageLink == "14") {
+      await Navigator.pushNamed(context, Routes.discoveryDetail, arguments: {
+        'id': 14,
+      });
+    } else if (service.imageLink == "15") {
+      await Navigator.pushNamed(context, Routes.discoveryDetail, arguments: {
+        'id': 15,
+      });
+    } else if (service.imageLink == "16") {
+      await Navigator.pushNamed(context, Routes.discoveryDetail, arguments: {
+        'id': 16,
+      });
+    } else if (service.imageLink == "17") {
+      await launchUrl(Uri.parse('https://pages.et4.de/de/einbeck/wlan/portal'),
+          mode: LaunchMode.inAppWebView);
     } else {
       AppBloc.discoveryCubit
           .setServiceValue(Preferences.type, service.type, null);
@@ -198,8 +213,11 @@ class _DiscoveryLoadedState extends State<DiscoveryLoaded> {
         AppBloc.discoveryCubit
             .setServiceValue(Preferences.categoryId, null, service.categoryId);
       }
-      Navigator.pushNamed(context, Routes.listProduct,
-          arguments: {'id': service.arguments, 'title': '', 'type': 'categoryService'});
+      Navigator.pushNamed(context, Routes.listProduct, arguments: {
+        'id': service.arguments,
+        'title': '',
+        'type': 'categoryService'
+      });
     }
   }
 

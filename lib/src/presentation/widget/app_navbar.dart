@@ -1,3 +1,5 @@
+// ignore_for_file: use_super_parameters
+
 import 'package:flutter/material.dart';
 import 'package:heidi/src/data/model/model_sort.dart';
 import 'package:heidi/src/utils/translate.dart';

@@ -15,7 +15,7 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'cubit/cubit.dart';
 
 class WishListScreen extends StatefulWidget {
-  const WishListScreen({Key? key}) : super(key: key);
+  const WishListScreen({super.key});
 
   @override
   State<WishListScreen> createState() => _WishListScreenState();
@@ -47,7 +47,7 @@ class _WishListScreenState extends State<WishListScreen> {
 }
 
 class WishListLoading extends StatelessWidget {
-  const WishListLoading({Key? key}) : super(key: key);
+  const WishListLoading({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -61,9 +61,9 @@ class WishListLoaded extends StatefulWidget {
   final List<FavoriteDetailsModel> favoritesList;
 
   const WishListLoaded({
-    Key? key,
+    super.key,
     required this.favoritesList,
-  }) : super(key: key);
+  });
 
   @override
   State<WishListLoaded> createState() => _WishListLoadedState();

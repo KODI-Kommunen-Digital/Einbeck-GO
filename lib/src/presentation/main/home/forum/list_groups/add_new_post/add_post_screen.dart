@@ -16,10 +16,10 @@ class AddPostScreen extends StatefulWidget {
   final bool isNewPost;
 
   const AddPostScreen({
-    Key? key,
+    super.key,
     this.item,
     required this.isNewPost,
-  }) : super(key: key);
+  });
 
   @override
   State<AddPostScreen> createState() => _AddPostScreenState();

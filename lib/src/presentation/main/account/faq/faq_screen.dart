@@ -12,7 +12,7 @@ import 'package:heidi/src/utils/translate.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class FaqScreen extends StatefulWidget {
-  const FaqScreen({Key? key}) : super(key: key);
+  const FaqScreen({super.key});
 
   @override
   State<FaqScreen> createState() => _FaqScreenState();
@@ -55,7 +55,7 @@ class _FaqScreenState extends State<FaqScreen> {
                 child: const PDF().fromUrl(
                   link,
                   placeholder: (progress) =>
-                  const Center(child: CircularProgressIndicator()),
+                      const Center(child: CircularProgressIndicator()),
                   errorWidget: (error) => Center(child: Text(error.toString())),
                 ))),
       );

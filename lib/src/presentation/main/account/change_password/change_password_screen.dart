@@ -8,7 +8,7 @@ import 'package:heidi/src/utils/translate.dart';
 import 'package:heidi/src/utils/validate.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
-  const ChangePasswordScreen({Key? key}) : super(key: key);
+  const ChangePasswordScreen({super.key});
 
   @override
   State<ChangePasswordScreen> createState() => _ChangePasswordScreenState();
@@ -59,10 +59,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       if (!mounted) return;
       if (result) {
         Navigator.pop(context);
-      }
-      else{
-        ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text('New password should not be same as the old password')));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content:
+                Text('New password should not be same as the old password')));
       }
     }
   }

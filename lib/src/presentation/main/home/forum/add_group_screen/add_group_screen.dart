@@ -17,10 +17,10 @@ class AddGroupScreen extends StatefulWidget {
   final bool isNewGroup;
 
   const AddGroupScreen({
-    Key? key,
+    super.key,
     this.item,
     required this.isNewGroup,
-  }) : super(key: key);
+  });
 
   @override
   State<AddGroupScreen> createState() => _AddGroupScreenState();

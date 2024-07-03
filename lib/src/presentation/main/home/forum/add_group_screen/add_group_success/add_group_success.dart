@@ -4,7 +4,7 @@ import 'package:heidi/src/utils/configs/routes.dart';
 import 'package:heidi/src/utils/translate.dart';
 
 class AddGroupSuccessScreen extends StatefulWidget {
-  const AddGroupSuccessScreen({Key? key}) : super(key: key);
+  const AddGroupSuccessScreen({super.key});
 
   @override
   State<AddGroupSuccessScreen> createState() => _AddGroupSuccessScreenState();
