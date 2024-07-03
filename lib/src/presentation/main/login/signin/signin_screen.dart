@@ -301,8 +301,9 @@ class _SignInLoadedState extends State<SignInLoaded> {
                         },
                         child: Text(
                           Translate.of(context).translate('info'),
-                          style: const TextStyle(
-                              color: Colors.blue, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              color: Theme.of(context).primaryColor,
+                              fontWeight: FontWeight.bold),
                         ),
                       ),
                     ],
