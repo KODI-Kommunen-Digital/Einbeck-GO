@@ -12,6 +12,7 @@ import 'cubit/cubit.dart';
 
 class DiscoveryScreenDetail extends StatefulWidget {
   final Map<String, dynamic> arguments;
+
   const DiscoveryScreenDetail({super.key, required this.arguments});
 
   @override
@@ -48,33 +49,38 @@ class _DiscoveryScreenState extends State<DiscoveryScreenDetail> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text(Translate.of(context).translate('cust_services')),
-      ),
-      body: BlocConsumer<DiscoveryCubit, DiscoveryState>(
-        listener: (context, state) {
-          state.maybeWhen(
-            error: (msg) => ScaffoldMessenger.of(context)
-                .showSnackBar(SnackBar(content: Text(msg))),
-            orElse: () {},
-          );
-        },
-        builder: (context, state) => state.when(
-          loading: () {
-            return const DiscoveryLoading();
+    return PopScope(
+      onPopInvoked: (value) {
+        context.read<DiscoveryCubit>().onLoad(1);
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          centerTitle: true,
+          title: Text(Translate.of(context).translate('cust_services')),
+        ),
+        body: BlocConsumer<DiscoveryCubit, DiscoveryState>(
+          listener: (context, state) {
+            state.maybeWhen(
+              error: (msg) => ScaffoldMessenger.of(context)
+                  .showSnackBar(SnackBar(content: Text(msg))),
+              orElse: () {},
+            );
           },
-          loaded: (list) => DiscoveryLoaded(
-            services: list,
+          builder: (context, state) => state.when(
+            loading: () {
+              return const DiscoveryLoading();
+            },
+            loaded: (list) => DiscoveryLoaded(
+              services: list,
+            ),
+            updated: (list) {
+              return Container();
+            },
+            error: (e) => ErrorWidget('Failed to load listings.'),
+            initial: () {
+              return Container();
+            },
           ),
-          updated: (list) {
-            return Container();
-          },
-          error: (e) => ErrorWidget('Failed to load listings.'),
-          initial: () {
-            return Container();
-          },
         ),
       ),
     );
