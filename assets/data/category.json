@@ -67,7 +67,7 @@
         },
         {
             "id": 16,
-            "name": "Abfallkalender",
+            "name": "Abfall",
             "noOfSubcategories": 0,
             "icon": "fas fa-trash",
             "color": "#81C14B",
