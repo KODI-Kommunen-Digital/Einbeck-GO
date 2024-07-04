@@ -178,7 +178,7 @@ class _MainScreenState extends State<MainScreen> {
             iconData,
             color: color,
           ),
-          const SizedBox(height: 2),
+          const SizedBox(height: 1),
           Text(
             Translate.of(context).translate(title),
             style: Theme.of(context).textTheme.labelLarge!.copyWith(
