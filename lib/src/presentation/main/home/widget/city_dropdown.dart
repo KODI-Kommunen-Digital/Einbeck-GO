@@ -1,6 +1,5 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:heidi/src/utils/translate.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 
 class CitiesDropDown extends StatefulWidget {
   final ValueSetter<String>? setLocationCallback;
@@ -21,54 +20,77 @@ class CitiesDropDown extends StatefulWidget {
 }
 
 class _CitiesDropDownState extends State<CitiesDropDown> {
+  final TextEditingController typeAheadController = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.selectedOption != null && widget.selectedOption!.isNotEmpty) {
+      typeAheadController.text = widget.selectedOption!;
+    }
+
+    _focusNode.addListener(() {
+      setState(() {}); // Trigger rebuild on focus change
+    });
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    typeAheadController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    String? chosenOption =
-        widget.selectedOption != "" ? widget.selectedOption : null;
-    EdgeInsets contentPadding = Platform.isIOS
-        ? const EdgeInsets.symmetric(vertical: 0.0, horizontal: 15.0)
-        : const EdgeInsets.symmetric(vertical: 0.0, horizontal: 15.0);
-
     return SafeArea(
       child: Container(
-        padding: const EdgeInsets.only(left: 10, right: 16, bottom: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         child: Card(
-          margin: const EdgeInsets.all(10),
+          elevation: 2,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          elevation: 2,
-          child: DropdownButtonFormField<String>(
-            value: chosenOption,
-            onChanged: (newValue) {
-              setState(() {
-                widget.setLocationCallback!(newValue!);
-                chosenOption = newValue;
-              });
-            },
-            items: widget.cityTitlesList?.map((String option) {
-              return DropdownMenuItem<String>(
-                value: option,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                      vertical: 0.0, horizontal: 10.0),
-                  child: Text(option, style: const TextStyle(fontSize: 16)),
-                ),
-              );
-            }).toList(),
-            decoration: InputDecoration(
-              contentPadding: contentPadding,
-              focusedBorder: const OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.white),
+          child: TypeAheadFormField(
+            textFieldConfiguration: TextFieldConfiguration(
+              controller: typeAheadController,
+              focusNode: _focusNode,
+              decoration: InputDecoration(
+                hintText: widget.hintText,
+                border: const OutlineInputBorder(),
+                suffixIcon:
+                    _focusNode.hasFocus && typeAheadController.text.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.clear),
+                            onPressed: () {
+                              setState(() {
+                                typeAheadController.clear();
+                              });
+                            },
+                          )
+                        : const Icon(Icons.arrow_drop_down),
               ),
-              labelText: widget.hintText ??
-                  Translate.of(context).translate('select_location'),
-              labelStyle: TextStyle(
-                color: Theme.of(context).textTheme.bodyLarge?.color ??
-                    Colors.white,
-              ),
-              border: const OutlineInputBorder(),
             ),
+            suggestionsCallback: (String pattern) async {
+              return widget.cityTitlesList!
+                  .where((item) =>
+                      item.toLowerCase().contains(pattern.toLowerCase()))
+                  .toList();
+            },
+            itemBuilder: (BuildContext context, suggestion) {
+              return ListTile(
+                title: Text(suggestion),
+              );
+            },
+            onSuggestionSelected: (suggestion) {
+              setState(() {
+                typeAheadController.text = suggestion;
+              });
+              if (widget.setLocationCallback != null) {
+                widget.setLocationCallback!(suggestion);
+              }
+            },
           ),
         ),
       ),

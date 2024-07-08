@@ -301,6 +301,10 @@ class ListRepository {
   Future<ResultApiModel> loadCategory() async {
     final response = await Api.requestSubmitCategory();
     var jsonCategory = response.data;
+
+    // Remove the category "Events"
+    jsonCategory.removeWhere((category) => category['name'] == "Events");
+
     final categoryId = jsonCategory.first['id'];
     prefs.setKeyValue(Preferences.categoryId, categoryId as int);
     return response;
