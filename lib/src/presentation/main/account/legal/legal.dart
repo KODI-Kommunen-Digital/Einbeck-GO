@@ -45,7 +45,7 @@ class _LegalScreenState extends State<LegalScreen> {
             AppListTitle(
               title: Translate.of(context).translate('imprint'),
               onPressed: () {
-                _makeAction('https://app.smartregion-auf.de/ImprintPage');
+                _makeAction('http://195.201.46.81:3000/ImprintPage');
               },
               trailing: Row(
                 children: <Widget>[
@@ -62,7 +62,7 @@ class _LegalScreenState extends State<LegalScreen> {
             AppListTitle(
               title: Translate.of(context).translate('privacy_policy'),
               onPressed: () {
-                _makeAction('https://app.smartregion-auf.de/PrivacyPolicy');
+                _makeAction('http://195.201.46.81:3000/PrivacyPolicy');
               },
               trailing: Row(
                 children: <Widget>[
@@ -79,7 +79,7 @@ class _LegalScreenState extends State<LegalScreen> {
             AppListTitle(
               title: Translate.of(context).translate('terms_of_use'),
               onPressed: () {
-                _makeAction('https://app.smartregion-auf.de/TermsOfUse');
+                _makeAction('http://195.201.46.81:3000/TermsOfUse');
               },
               trailing: Row(
                 children: <Widget>[
