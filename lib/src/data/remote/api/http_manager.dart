@@ -20,7 +20,7 @@ class HTTPManager {
         //    ? 'https://app.smartregion-auf.de/api/'
         //    : 'https://app.smartregion-auf.de/forumapi/';
         ? 'http://195.201.46.81:3001/'
-        : 'http://195.201.46.81:3001/';
+        : 'http://195.201.46.81:3002/';
     // ? 'http://localhost:3001/'
     //     : 'http://localhost:3002/';
     //? 'https://app.geseke.it/api/'
