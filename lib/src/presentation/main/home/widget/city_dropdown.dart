@@ -126,6 +126,9 @@ class _CitiesDropDownState extends State<CitiesDropDown> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDarkMode ? Colors.white : Colors.black;
+
     return CompositedTransformTarget(
       link: _layerLink,
       child: Container(
@@ -135,24 +138,25 @@ class _CitiesDropDownState extends State<CitiesDropDown> {
           focusNode: _focusNode,
           decoration: InputDecoration(
             hintText: widget.hintText ?? 'Select Location',
+            hintStyle: TextStyle(color: textColor.withOpacity(0.6)),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Colors.white),
+              borderSide: BorderSide(color: textColor),
             ),
             filled: true,
-            fillColor: Colors.black,
-            hintStyle: const TextStyle(color: Colors.white),
+            fillColor: isDarkMode ? Colors.black : Colors.white,
             suffixIcon: _focusNode.hasFocus
                 ? IconButton(
-                    icon: const Icon(Icons.clear, color: Colors.white),
+                    icon: Icon(Icons.clear, color: textColor),
                     onPressed: () {
                       setState(() {
                         _controller.clear();
                       });
                     },
                   )
-                : const Icon(Icons.arrow_drop_down, color: Colors.white),
+                : Icon(Icons.arrow_drop_down, color: textColor),
           ),
+          style: TextStyle(color: textColor),
         ),
       ),
     );

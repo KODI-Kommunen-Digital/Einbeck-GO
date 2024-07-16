@@ -2,19 +2,19 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Einbeck",
+            "name": "EinbeckGO",
             "request": "launch",
             "type": "dart",
             "program": "lib/main_dev.dart"
         },
         {
-            "name": "Einbeck (profile mode)",
+            "name": "EinbeckGO (profile mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "profile"
         },
         {
-            "name": "Einbeck (release mode)",
+            "name": "EinbeckGO (release mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "release"

@@ -139,7 +139,7 @@ class AppProductItem extends StatelessWidget {
                       style: Theme.of(context)
                           .textTheme
                           .bodySmall!
-                          .copyWith(fontWeight: FontWeight.bold),
+                          .copyWith(fontWeight: FontWeight.w500),
                     ),
                     const SizedBox(height: 2),
                     Visibility(

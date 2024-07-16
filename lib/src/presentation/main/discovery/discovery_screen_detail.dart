@@ -170,7 +170,7 @@ class _DiscoveryLoadedState extends State<DiscoveryLoaded> {
     } else if (service.arguments == 142) {
       await launchUrl(
           Uri.parse(
-              'https://stadt-einbeck.saas.smartcjm.com/m/Buergerbuero/extern/calendar/?uid=3e5df0d1-ea60-4078-bbc4-783f5909672c&wsid=881a0c58-9c89-4ae3-b15d-38cbff863eb0&lang=de'),
+              'https://stadt-einbeck.saas.smartcjm.com/m/Buergerbuero/extern/calendar/?uid=3e5df0d1-ea60-4078-bbc4-783f5909672c&wsid=25d20142-48b8-4eaf-8915-e9a964f579b8&lang=de'),
           mode: LaunchMode.inAppWebView);
     } else if (service.arguments == 143) {
       await launchUrl(Uri.parse('https://ris.kdgoe.de/EIN_public/'),
