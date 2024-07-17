@@ -292,7 +292,7 @@ class _ListLoadedState extends State<ListLoaded> {
           userId: widget.userId,
           onPressed: (value) async {
             if (value) {
-              Navigator.pushNamed(context, Routes.groupChat, arguments: item)
+              Navigator.pushNamed(context, Routes.groupChat, arguments: {'group': item})
                   .then((value) async {
                 await context.read<ListGroupsCubit>().onLoad();
                 //setState(() {});

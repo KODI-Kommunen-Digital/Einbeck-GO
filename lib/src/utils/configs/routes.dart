@@ -416,9 +416,16 @@ class Routes {
       case groupChat:
         return MaterialPageRoute(
           builder: (context) {
+            final Map<String, dynamic> arguments =
+                settings.arguments as Map<String, dynamic>;
             return BlocProvider(
               create: (context) => ChatCubit(),
-              child: ChatScreen(),
+              child: BlocProvider(
+                  create: (context) =>
+                      GroupDetailsCubit(context.read(), arguments['group']),
+                  child: ChatScreen(
+                    isAdmin: true,
+                  )),
             );
           },
           fullscreenDialog: true,
