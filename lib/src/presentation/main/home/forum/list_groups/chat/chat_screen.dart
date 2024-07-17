@@ -24,14 +24,14 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<GroupDetailsCubit, GroupDetailsState>(
-            builder: (context, state) => state.maybeWhen(
-                loading: () => const ChatLoading(),
-                loaded: (list, group, isAdmin, userId) => ChatLoaded(
-                      group: group,
-                      isAdmin: isAdmin,
-                      userId: userId,
-                    ),
-                orElse: () => ErrorWidget("Failed to load chat.")));
+        builder: (context, state) => state.maybeWhen(
+            loading: () => const ChatLoading(),
+            loaded: (list, group, isAdmin, userId) => ChatLoaded(
+                  group: group,
+                  isAdmin: isAdmin,
+                  userId: userId,
+                ),
+            orElse: () => ErrorWidget("Failed to load chat.")));
   }
 }
 
@@ -83,8 +83,6 @@ class _ChatLoadedState extends State<ChatLoaded> {
           ],
         ),
         actions: [
-          IconButton(icon: const Icon(Icons.call), onPressed: () {}),
-          IconButton(icon: const Icon(Icons.video_call), onPressed: () {}),
           PopupMenuButton<String>(
             icon: const Icon(
               Icons.more_vert, // Three vertical dots icon

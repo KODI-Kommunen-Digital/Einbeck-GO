@@ -4,7 +4,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:heidi/src/data/model/model_forum_group.dart';
-import 'package:heidi/src/presentation/main/account/dashboard/my_groups/cubit/my_groups_cubit.dart';
 import 'package:heidi/src/presentation/main/home/forum/list_groups/cubit/cubit.dart';
 import 'package:heidi/src/presentation/main/home/widget/empty_product_item.dart';
 import 'package:heidi/src/presentation/widget/app_placeholder.dart';
@@ -167,16 +166,11 @@ class _ForumGroupItemState extends State<ForumGroupItem> {
                             if (isJoined == false) {
                               showJoinGroupDialog(context, widget.item?.id);
                             } else {
-                              Navigator.pushNamed(context, Routes.groupDetails,
-                                      arguments: widget.item)
+                              Navigator.pushNamed(context, Routes.groupChat,
+                                      arguments: {'group': widget.item})
                                   .then((value) async {
-                                if (widget.fromGroupList) {
-                                  await context
-                                      .read<ListGroupsCubit>()
-                                      .onLoad();
-                                } else {
-                                  await context.read<MyGroupsCubit>().onLoad();
-                                }
+                                await context.read<ListGroupsCubit>().onLoad();
+                                //setState(() {});
                               });
                               // widget.onPressed;
                             }
