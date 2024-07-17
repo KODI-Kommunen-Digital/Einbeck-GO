@@ -15,6 +15,7 @@ class FilterScreen extends StatefulWidget {
 
 class _FilterScreenState extends State<FilterScreen> {
   int? currentCity;
+  List<int> currentCities = [];
   int? currentCategory;
   int? currentListingStatus;
   ProductFilter? currentProductEventFilter;
@@ -23,7 +24,11 @@ class _FilterScreenState extends State<FilterScreen> {
   @override
   void initState() {
     super.initState();
-    currentCity = widget.multiFilter.currentLocation;
+    if (widget.multiFilter.multipleCityFilter) {
+      currentCities = widget.multiFilter.currentLocation.cast<int>();
+    } else {
+      currentCity = widget.multiFilter.currentLocation;
+    }
     currentCategory = widget.multiFilter.currentCategory;
     currentProductEventFilter = widget.multiFilter.currentProductEventFilter;
     currentListingStatus = widget.multiFilter.currentListingStatus;
@@ -46,7 +51,9 @@ class _FilterScreenState extends State<FilterScreen> {
             Navigator.pop(
                 context,
                 MultiFilter(
-                    currentLocation: currentCity,
+                    currentLocation: (widget.multiFilter.multipleCityFilter)
+                        ? currentCities
+                        : currentCity,
                     currentProductEventFilter: currentProductEventFilter,
                     currentListingStatus: currentListingStatus,
                     currentForumGroupFilter: currentForumGroupFilter,
@@ -94,25 +101,53 @@ class _FilterScreenState extends State<FilterScreen> {
       Container(
         padding: const EdgeInsets.all(8.0),
         child: Wrap(spacing: 8.0, children: [
-          ChoiceChip(
-            label: Text(Translate.of(context).translate('select_location')),
-            selected: 0 == currentCity,
-            onSelected: (selected) {
-              setState(() {
-                currentCity = 0;
-              });
-            },
-          ),
+          (widget.multiFilter.multipleCityFilter)
+              ? ChoiceChip(
+                  label:
+                      Text(Translate.of(context).translate('select_location')),
+                  selected: currentCities.contains(0),
+                  onSelected: (selected) {
+                    setState(() {
+                      currentCities = [];
+                      currentCities.add(0);
+                    });
+                  },
+                )
+              : ChoiceChip(
+                  label:
+                      Text(Translate.of(context).translate('select_location')),
+                  selected: 0 == currentCity,
+                  onSelected: (selected) {
+                    setState(() {
+                      currentCity = 0;
+                    });
+                  },
+                ),
           ...widget.multiFilter.cities!.map((city) {
-            return ChoiceChip(
-              label: Text(city.title),
-              selected: city.id == currentCity,
-              onSelected: (selected) {
-                setState(() {
-                  currentCity = city.id;
-                });
-              },
-            );
+            return (widget.multiFilter.multipleCityFilter)
+                ? ChoiceChip(
+                    label: Text(city.title),
+                    selected: currentCities.contains(city.id),
+                    onSelected: (selected) {
+                      setState(() {
+                        if (currentCities.contains(city.id)) {
+                          currentCities.remove(city.id);
+                        } else {
+                          currentCities.add(city.id);
+                          currentCities.remove(0);
+                        }
+                      });
+                    },
+                  )
+                : ChoiceChip(
+                    label: Text(city.title),
+                    selected: city.id == currentCity,
+                    onSelected: (selected) {
+                      setState(() {
+                        currentCity = city.id;
+                      });
+                    },
+                  );
           }),
         ]),
       )
