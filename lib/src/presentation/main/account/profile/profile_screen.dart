@@ -345,6 +345,10 @@ class _ProfileLoadedState extends State<ProfileLoaded> {
                                                                           .bold,
                                                                 ),
                                                           ),
+                                                          if (userListingsList[
+                                                          index]
+                                                              .viewCount !=
+                                                              null)
                                                           Text(
                                                             '${Translate.of(context).translate('views')}: ${userListingsList[index].viewCount ?? 0}',
                                                             style: Theme.of(
