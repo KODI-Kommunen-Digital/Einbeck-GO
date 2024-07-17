@@ -15,41 +15,9 @@ class ProfileCubit extends Cubit<ProfileState> {
   }
 
   Future<List<ProductModel>> loadUserListing(userId, pageNo) async {
-    List<ProductModel> listDataList = [];
-    final result = await repo.loadUserListings(userId, pageNo);
-    for (final list in result) {
-      final product = await loadProduct(list.cityId, list.id);
-      if (product != null) {
-        listDataList.add(
-          ProductModel(
-            id: list.id,
-            cityId: list.cityId,
-            title: product.title,
-            image: list.logo!,
-            pdf: product.pdf,
-            category: product.category,
-            categoryId: product.categoryId,
-            subcategoryId: product.subcategoryId,
-            startDate: product.startDate,
-            endDate: product.endDate,
-            createDate: product.createDate,
-            favorite: product.favorite,
-            address: product.address,
-            phone: product.phone,
-            email: product.email,
-            website: product.website,
-            externalId: product.externalId,
-            description: product.description,
-            userId: product.userId,
-            sourceId: product.sourceId,
-            expiryDate: product.expiryDate,
-            imageLists: product.imageLists,
-          ),
-        );
-      }
-    }
-    emit(ProfileState.loaded(listDataList));
-    return listDataList;
+    final list = await repo.loadUserListings(userId, pageNo);
+    emit(ProfileState.loaded(list));
+    return list;
   }
 
   Future<List<ProductModel>> newListings(userId, pageNo) async {
