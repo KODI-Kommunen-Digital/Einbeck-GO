@@ -66,18 +66,17 @@ class _ChatLoadedState extends State<ChatLoaded> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Row(
+        title: Row(
           children: [
-            CircleAvatar(
+            const CircleAvatar(
               backgroundImage: NetworkImage('https://example.com/avatar.jpg'),
             ),
-            SizedBox(width: 8),
+            const SizedBox(width: 8),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Developer', style: TextStyle(fontSize: 16)),
-                Text('3 Online',
-                    style: TextStyle(fontSize: 12, color: Colors.grey)),
+                Text(widget.group.forumName ?? 'Group',
+                    style: const TextStyle(fontSize: 16)),
               ],
             ),
           ],
