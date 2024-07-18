@@ -147,28 +147,32 @@ class _DiscoveryLoadedState extends State<DiscoveryLoaded> {
       scrollUp();
     }
     return Scaffold(
-      body: GridView.builder(
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2, // Adjust the number of columns as desired
-            crossAxisSpacing: 10.0,
-            mainAxisSpacing: 10.0,
-            mainAxisExtent: 300.0),
-        itemCount: services.length,
-        controller: _scrollController,
-        itemBuilder: (BuildContext context, int index) {
-          return InkWell(
-            onTap: () {
-              navigateToLink(services[index]);
-            },
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(15.0),
-              child: Image.asset(
-                services[index].imageUrl,
-                fit: BoxFit.cover,
+      body: Padding(
+        padding: const EdgeInsets.symmetric(
+            horizontal: 10.0), // Adjust padding as needed
+        child: GridView.builder(
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 10.0,
+              mainAxisSpacing: 10.0,
+              mainAxisExtent: 300.0),
+          itemCount: services.length,
+          controller: _scrollController,
+          itemBuilder: (BuildContext context, int index) {
+            return InkWell(
+              onTap: () {
+                navigateToLink(services[index]);
+              },
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(15.0),
+                child: Image.asset(
+                  services[index].imageUrl,
+                  fit: BoxFit.cover,
+                ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

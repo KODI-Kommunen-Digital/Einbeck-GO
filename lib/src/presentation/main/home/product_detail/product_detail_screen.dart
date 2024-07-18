@@ -1107,8 +1107,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               Navigator.of(context).pop();
             },
           ),
-          expandedHeight: MediaQuery.of(context).size.height * 0.27,
-          pinned: true,
+          expandedHeight: Platform.isAndroid
+              ? MediaQuery.of(context).size.height * 0.19
+              : MediaQuery.of(context).size.height * 0.27,
+          pinned: false,
           actions: action,
           iconTheme: Theme.of(context).iconTheme.copyWith(color: _iconColor),
           flexibleSpace: FlexibleSpaceBar(
