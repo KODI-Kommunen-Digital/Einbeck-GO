@@ -283,8 +283,8 @@ class _AddListingScreenState extends State<AddListingScreen> {
       _createdAt = widget.item?.createDate ?? '';
       selectedCategory = jsonCategory.firstWhere(
           (element) => element["id"] == widget.item!.categoryId)["name"];
-      selectedSubCategory = listSubCategory.firstWhere(
-          (element) => element["id"] == widget.item!.subcategoryId)["name"];
+      // selectedSubCategory = listSubCategory.firstWhere(
+      //     (element) => element["id"] == widget.item!.subcategoryId)["name"];
 
       final city = listCity
           .firstWhere((element) => element['id'] == widget.item?.cityId);
