@@ -331,6 +331,20 @@ class _AllRequestsLoadedState extends State<AllRequestsLoaded> {
                                                                   .circular(10),
                                                         ),
                                                         child: ElevatedButton(
+                                                          style: ElevatedButton
+                                                              .styleFrom(
+                                                            backgroundColor:
+                                                                Theme.of(
+                                                                        context)
+                                                                    .primaryColor,
+                                                            shape:
+                                                                RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          8),
+                                                            ),
+                                                          ),
                                                           onPressed: () async {
                                                             _openListingStatusActionPopUp(
                                                                 item);

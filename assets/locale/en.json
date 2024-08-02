@@ -512,7 +512,6 @@
   "report_post_hint":"Give reason",
   "image_size_exceed":"Image Size Exceeded",
   "select_small_images":"Bitte wählen Sie Bilder aus, die 10 MB oder weniger groß sind.",
-  "quelle":"Source",
   "choose_time_period": "Choose time period",
   "choose_listing_status": "Choose listing status",
   "choose_forum": "Choose forum",
@@ -522,5 +521,6 @@
   "openSettings" : "Open Settings",
   "enableNotification": "Enable Notifications",
   "welcomeForumTitle": "Welcome to the group function!",
-  "welcomeForum": "Here you can create new groups using the blue plus icon. You can create private and public groups. Members can join public groups at any time and make a request for private groups. Have fun!"
+  "welcomeForum": "Here you can create new groups using the blue plus icon. You can create private and public groups. Members can join public groups at any time and make a request for private groups. Have fun!",
+  "views": "Views"
 }

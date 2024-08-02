@@ -72,8 +72,9 @@ class _ListProductScreenState extends State<ListProductScreen> {
           currentProductEventFilter: selectedFilter?.currentProductEventFilter,
           hasLocationFilter: true,
           currentLocation:
-              selectedFilter?.currentLocation ?? widget.arguments['id'],
-          cities: AppBloc.discoveryCubit.location);
+              selectedFilter?.currentLocation ?? [widget.arguments['id']],
+          cities: AppBloc.discoveryCubit.location,
+          multipleCityFilter: true);
     } else {
       return MultiFilter(
           hasLocationFilter: true,
@@ -83,26 +84,26 @@ class _ListProductScreenState extends State<ListProductScreen> {
     }
   }
 
-  void _updateSelectedFilter(MultiFilter? filter) {
+  void _updateSelectedFilter(MultiFilter? filter) async {
     selectedFilter = filter;
-    final loadedList = context.read<ListCubit>().getLoadedList();
-    setState(() {
-      if (filter?.hasProductEventFilter ?? false) {
-        context.read<ListCubit>().onDateProductFilter(
-            filter?.currentProductEventFilter,
-            loadedList,
-            filter?.hasLocationFilter ?? false,
-            filter?.currentLocation);
-      } else if (filter?.hasLocationFilter ?? false) {
-        loadListingsList();
-      }
+    dynamic loadedList = context.read<ListCubit>().getLoadedList();
+    if (filter?.hasProductEventFilter ?? false) {
+      loadedList = await context
+          .read<ListCubit>()
+          .updateLoadedList(filter!.currentLocation);
+      context.read<ListCubit>().onDateProductFilter(
+          filter.currentProductEventFilter,
+          loadedList,
+          filter.hasLocationFilter,
+          filter.currentLocation);
+    } else if (filter?.hasLocationFilter ?? false) {
+      loadListingsList();
+    }
 
-      if (filter?.hasCategoryFilter ?? false) {
-        context.read<ListCubit>().setCategoryFilter(
-            filter?.currentCategory ?? 0,
-            selectedFilter?.currentLocation ?? widget.arguments['id']);
-      }
-    });
+    if (filter?.hasCategoryFilter ?? false) {
+      context.read<ListCubit>().setCategoryFilter(filter?.currentCategory ?? 0,
+          selectedFilter?.currentLocation ?? widget.arguments['id']);
+    }
   }
 
   void _makeAction(String link) async {
@@ -213,10 +214,19 @@ class _ListProductScreenState extends State<ListProductScreen> {
                         ),
                       if (!isCategoryService)
                         AppFilterButton(
-                            multiFilter: whatCanFilter(isEvent),
-                            filterCallBack: (filter) {
-                              _updateSelectedFilter(filter);
-                            }),
+                          voidCallback: () {
+                            MultiFilter multiFilter = whatCanFilter(isEvent);
+                            Navigator.pushNamed(context, Routes.filterScreen,
+                                    arguments: {"multifilter": multiFilter})
+                                .then((filter) => {
+                                      if (filter != null)
+                                        {
+                                          _updateSelectedFilter(
+                                              filter as MultiFilter)
+                                        }
+                                    });
+                          },
+                        ),
                       IconButton(
                           onPressed: () {
                             _searchListings();
@@ -340,7 +350,7 @@ class ListLoading extends StatelessWidget {
 
 class ListLoaded extends StatefulWidget {
   final List<ProductModel> list;
-  final int selectedId;
+  final dynamic selectedId;
   final List listCity;
   final bool updated;
 

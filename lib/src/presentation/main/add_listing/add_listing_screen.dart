@@ -283,8 +283,8 @@ class _AddListingScreenState extends State<AddListingScreen> {
       _createdAt = widget.item?.createDate ?? '';
       selectedCategory = jsonCategory.firstWhere(
           (element) => element["id"] == widget.item!.categoryId)["name"];
-      selectedSubCategory = listSubCategory.firstWhere(
-          (element) => element["id"] == widget.item!.subcategoryId)["name"];
+      // selectedSubCategory = listSubCategory.firstWhere(
+      //     (element) => element["id"] == widget.item!.subcategoryId)["name"];
 
       final city = listCity
           .firstWhere((element) => element['id'] == widget.item?.cityId);
@@ -389,7 +389,7 @@ class _AddListingScreenState extends State<AddListingScreen> {
     final DateTime initialDate = _expiryDate != null
         ? DateFormat('yyyy-MM-dd').parse(_expiryDate!)
         : now.add(const Duration(days: 14));
-    final DateTime firstDate = DateTime(now.year - 5);
+    final DateTime firstDate = now;
     final DateTime lastDate = DateTime(now.year + 5);
 
     final DateTime? picked = await showDatePicker(
@@ -983,7 +983,8 @@ class _AddListingScreenState extends State<AddListingScreen> {
               ],
             ),
             if ((selectedCategory?.toLowerCase() == "news" ||
-                selectedCategory == null) && selectedSubCategory != null)
+                    selectedCategory == null) &&
+                selectedSubCategory != null)
               const SizedBox(height: 8),
             if ((selectedCategory?.toLowerCase() == "news" ||
                     selectedCategory == null) &&

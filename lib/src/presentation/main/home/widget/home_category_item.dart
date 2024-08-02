@@ -73,8 +73,8 @@ class HomeCategoryItem extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: Theme.of(context)
                   .textTheme
-                  .labelLarge!
-                  .copyWith(fontSize: 12),
+                  .labelMedium!
+                  .copyWith(fontSize: 10),
             ),
           ],
         ),

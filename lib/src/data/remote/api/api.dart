@@ -67,6 +67,12 @@ class Api {
     return ResultApiModel.fromJson(result);
   }
 
+  static Future<ResultApiModel> requestMyListings(pageNo) async {
+    final result = await HTTPManager(forum: false)
+        .get(url: 'users/myListings');
+    return ResultApiModel.fromJson(result);
+  }
+
   static Future<ResultApiModel> requestForum(cityId, pageNo) async {
     final filepath = "/cities/$cityId/forums?pageNo=$pageNo";
     final result = await HTTPManager(forum: true).get(url: filepath);
@@ -487,7 +493,7 @@ class Api {
       if (cityId != 0 && cityId != null) {
         var list =
             '/listings?categoryId=$params&statusId=1&pageNo=$pageNo&pageSize=19&sortByStartDate=true&cityId=$cityId&showExternalListings=$showExternalListings';
-        final result = await HTTPManager(forum: false).get(url: list);
+        final result = await HTTPManager(forum: false).get(url: list, loading: true);
         return ResultApiModel.fromJson(result);
       } else {
         var list =

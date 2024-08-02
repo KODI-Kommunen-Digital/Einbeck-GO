@@ -36,12 +36,26 @@ class ListCubit extends Cubit<ListState> {
     final categoryId = prefs.getKeyValue(Preferences.categoryId, 0);
     final type = prefs.getKeyValue(Preferences.type, '');
     listCity = await getCityList() ?? [];
-    final result = await ListRepository.loadList(
-      categoryId: (categoryId == 0) ? "" : categoryId,
-      type: type,
-      pageNo: pageNo,
-      cityId: cityId,
-    );
+    dynamic result;
+    if (cityId is List) {
+      result = [];
+      for (var city in cityId) {
+        final list = await ListRepository.loadList(
+          categoryId: (categoryId == 0) ? "" : categoryId,
+          type: type,
+          pageNo: pageNo,
+          cityId: city,
+        );
+        result.addAll(list);
+      }
+    } else {
+      result = await ListRepository.loadList(
+        categoryId: (categoryId == 0) ? "" : categoryId,
+        type: type,
+        pageNo: pageNo,
+        cityId: cityId,
+      );
+    }
     if (result != null) {
       list = result[0];
       pagination = result[1];
@@ -69,12 +83,27 @@ class ListCubit extends Cubit<ListState> {
     final categoryId = prefs.getKeyValue(Preferences.categoryId, 0);
     final type = prefs.getKeyValue(Preferences.type, '');
 
-    final result = await ListRepository.loadList(
-      categoryId: (categoryId == 0) ? "" : categoryId,
-      type: type,
-      pageNo: pageNo,
-      cityId: city,
-    );
+    dynamic result;
+
+    if (city is List) {
+      result = [];
+      for (var cityId in city) {
+        final list = await ListRepository.loadList(
+          categoryId: (categoryId == 0) ? "" : categoryId,
+          type: type,
+          pageNo: pageNo,
+          cityId: cityId,
+        );
+        result.addAll(list);
+      }
+    } else {
+      result = await ListRepository.loadList(
+        categoryId: (categoryId == 0) ? "" : categoryId,
+        type: type,
+        pageNo: pageNo,
+        cityId: city,
+      );
+    }
 
     final listUpdated = result?[0] ?? [];
     if (listUpdated.isNotEmpty) {
@@ -84,6 +113,24 @@ class ListCubit extends Cubit<ListState> {
   }
 
   List<ProductModel> getLoadedList() => listLoaded;
+
+  Future<List<ProductModel>> updateLoadedList(city) async {
+    final prefs = await Preferences.openBox();
+    final categoryId = prefs.getKeyValue(Preferences.categoryId, 0);
+    final type = prefs.getKeyValue(Preferences.type, '');
+    List<ProductModel> result = [];
+    for (var cityId in city) {
+      final list = await ListRepository.loadList(
+        categoryId: (categoryId == 0) ? "" : categoryId,
+        type: type,
+        pageNo: pageNo,
+        cityId: cityId,
+      );
+      result.addAll(list?[0] as List<ProductModel>? ?? []);
+    }
+    listLoaded = result;
+    return listLoaded;
+  }
 
   Future<void> searchListing(content, bool newSearch) async {
     if (newSearch) {
@@ -152,7 +199,7 @@ class ListCubit extends Cubit<ListState> {
   }
 
   void onDateProductFilter(ProductFilter? type, List<ProductModel> loadedList,
-      bool filterLocation, int? currentCity) {
+      bool filterLocation, List<int>? currentCity) {
     final currentDate = DateTime.now();
     if (type == ProductFilter.month) {
       filteredList = loadedList.where((product) {
@@ -160,9 +207,9 @@ class ListCubit extends Cubit<ListState> {
         if (startDate != null) {
           final startMonth = startDate.month;
           final currentMonth = currentDate.month;
-          if (filterLocation && (currentCity ?? 0) != 0) {
+          if (filterLocation && (currentCity ?? []).isNotEmpty) {
             return (startMonth == currentMonth) &&
-                (product.cityId == currentCity);
+                (currentCity!.contains(product.cityId));
           } else {
             return startMonth == currentMonth;
           }
@@ -177,9 +224,9 @@ class ListCubit extends Cubit<ListState> {
         if (startDate != null) {
           final startWeek = _getWeekNumber(startDate);
           final currentWeek = _getWeekNumber(currentDate);
-          if (filterLocation && (currentCity ?? 0) != 0) {
+          if (filterLocation && (currentCity ?? []).isNotEmpty) {
             return (startWeek == currentWeek) &&
-                (product.cityId == currentCity);
+                (currentCity!.contains(product.cityId));
           } else {
             return startWeek == currentWeek;
           }
@@ -188,10 +235,16 @@ class ListCubit extends Cubit<ListState> {
       }).toList();
 
       emit(ListStateUpdated(filteredList, listCity));
-    } else if (type == null && filterLocation && (currentCity ?? 0) != 0) {
-      filteredList = loadedList.where((product) {
-        return product.cityId == currentCity;
-      }).toList();
+    } else if (type == null &&
+        filterLocation &&
+        (currentCity ?? []).isNotEmpty) {
+      if ((currentCity ?? []).contains(0)) {
+        filteredList = loadedList;
+      } else {
+        filteredList = loadedList.where((product) {
+          return currentCity!.contains(product.cityId);
+        }).toList();
+      }
       emit(ListStateUpdated(filteredList, listCity));
     } else {
       emit(ListStateUpdated(loadedList, listCity));

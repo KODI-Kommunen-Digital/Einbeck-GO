@@ -11,13 +11,15 @@ class MultiFilter {
 
   final List<CategoryModel>? cities; //All cities
   final List<CategoryModel>? categories;
-  final int? currentLocation; //Location IDs
+  final dynamic currentLocation; //Location IDs
 
   final bool hasListingStatusFilter;
   final bool hasForumGroupFilter;
   final bool hasProductEventFilter;
   final bool hasLocationFilter;
   final bool hasCategoryFilter;
+
+  final bool multipleCityFilter;
 
   MultiFilter(
       {this.currentLocation,
@@ -31,5 +33,6 @@ class MultiFilter {
       this.hasForumGroupFilter = false,
       this.hasProductEventFilter = false,
       this.hasLocationFilter = false,
-      this.hasCategoryFilter = false});
+      this.hasCategoryFilter = false,
+      this.multipleCityFilter = false});
 }
