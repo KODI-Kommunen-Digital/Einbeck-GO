@@ -21,39 +21,42 @@ class _ChatInputState extends State<ChatInput> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(8.0),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        boxShadow: [
-          BoxShadow(
-            color: Theme.of(context).shadowColor.withOpacity(.1),
-            spreadRadius: 4,
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: <Widget>[
-          Expanded(
-            child: TextField(
-              decoration: const InputDecoration(
-                hintText: 'Type something...',
-                border: InputBorder.none,
-              ),
-              controller: _editingController,
-              onSubmitted: (value) {
-                _onSend();
-              },
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8.0), // Move it up a bit
+      child: Container(
+        padding: const EdgeInsets.all(8.0),
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          boxShadow: [
+            BoxShadow(
+              color: Theme.of(context).shadowColor.withOpacity(.1),
+              spreadRadius: 4,
+              blurRadius: 4,
+              offset: const Offset(0, 2),
             ),
-          ),
-          IconButton(
-            icon:
-                Icon(Icons.send, color: Theme.of(context).colorScheme.primary),
-            onPressed: _onSend,
-          ),
-        ],
+          ],
+        ),
+        child: Row(
+          children: <Widget>[
+            Expanded(
+              child: TextField(
+                decoration: const InputDecoration(
+                  hintText: 'Geben Sie Ihre Nachricht ein...',
+                  border: InputBorder.none,
+                ),
+                controller: _editingController,
+                onSubmitted: (value) {
+                  _onSend();
+                },
+              ),
+            ),
+            IconButton(
+              icon: Icon(Icons.send,
+                  color: Theme.of(context).colorScheme.primary),
+              onPressed: _onSend,
+            ),
+          ],
+        ),
       ),
     );
   }

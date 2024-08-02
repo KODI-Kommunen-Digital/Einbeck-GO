@@ -524,6 +524,7 @@
   "enableNotification": "Benachrichtigungen aktivieren",
   "welcomeForumTitle": "Willkommen bei der Gruppenfunktion!",
   "welcomeForum": "Hier können über das blaue Plusicon neue Gruppen von dir erstellt werden. Du kannst private und öffentliche Gruppen erstellen. Mitglieder können jederzeit bei öffentlichen Gruppen beitreten und bei privaten Gruppen eine Anfrage stellen. Viel Spaß!",
-  "views": "Aufrufe"
+  "views": "Aufrufe",
+  "group_name": "Gruppenname"
 }
 

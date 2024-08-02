@@ -99,9 +99,21 @@ class Api {
     return ResultApiModel.fromJson(result);
   }
 
+  // static Future<ResultApiModel> requestToJoinGroup(
+  //     forumId, cityId, params) async {
+  //   final filepath = "cities/$cityId/forums/$forumId/memberRequests";
+  //   final result = await HTTPManager(forum: true).post(
+  //     url: filepath,
+  //     data: params,
+  //   );
+  //   return ResultApiModel.fromJson(result);
+  // }
+
   static Future<ResultApiModel> requestToJoinGroup(forumId, cityId) async {
     final filepath = "cities/$cityId/forums/$forumId/memberRequests";
-    final result = await HTTPManager(forum: true).post(url: filepath);
+    final result = await HTTPManager(forum: true).post(
+      url: filepath,
+    );
     return ResultApiModel.fromJson(result);
   }
 
@@ -646,6 +658,45 @@ class Api {
     var list =
         '/listings/search?searchQuery=$content$filter&pageNo=$pageNo&pageSize=10';
     final result = await HTTPManager(forum: false).get(url: list);
+    return ResultApiModel.fromJson(result);
+  }
+
+  static Future<ResultApiModel> getForumKeys(
+      {required int forumId,
+      required int userId,
+      required int cityId,
+      required Map<String, dynamic> params}) async {
+    final String filepath =
+        "/cities/$cityId/forums/$forumId/members/get-forum-keys";
+    final result = await HTTPManager(forum: true).post(
+      url: filepath,
+      data: params,
+    );
+    return ResultApiModel.fromJson(result);
+  }
+
+  static Future<ResultApiModel> getForumChatMessages(
+      {required int forumId,
+      required int cityId,
+      required int lastMessageId,
+      required int offset}) async {
+    final String filepath =
+        "/cities/$cityId/forums/$forumId/chat?lastMessageId=$lastMessageId&offset=$offset";
+    final result = await HTTPManager(forum: true).get(
+      url: filepath,
+    );
+    return ResultApiModel.fromJson(result);
+  }
+
+  static Future<ResultApiModel> sendChatMessage(
+      {required int forumId,
+      required int cityId,
+      required String params}) async {
+    final String filepath = "/cities/$cityId/forums/$forumId/chat";
+    final result = await HTTPManager(forum: true).post(
+      url: filepath,
+      data: params,
+    );
     return ResultApiModel.fromJson(result);
   }
 

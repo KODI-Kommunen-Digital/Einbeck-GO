@@ -1,7 +1,9 @@
-import 'dart:io';
+// ignore_for_file: unused_local_variable
 
+import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:heidi/src/data/model/model.dart';
+import 'package:heidi/src/data/model/model_chat_message.dart';
 import 'package:heidi/src/data/model/model_comment.dart';
 import 'package:heidi/src/data/model/model_forum_group.dart';
 import 'package:heidi/src/data/model/model_forum_status.dart';
@@ -9,10 +11,12 @@ import 'package:heidi/src/data/model/model_product.dart';
 import 'package:heidi/src/data/model/model_request_member.dart';
 import 'package:heidi/src/data/remote/api/api.dart';
 import 'package:heidi/src/utils/configs/application.dart';
+import 'package:heidi/src/utils/configs/key_helper.dart';
 import 'package:heidi/src/utils/configs/preferences.dart';
 import 'package:heidi/src/utils/logger.dart';
 import 'package:heidi/src/utils/logging/loggy_exp.dart';
 import 'package:http_parser/http_parser.dart';
+import 'package:rsa_encrypt/rsa_encrypt.dart';
 
 class ForumRepository {
   final Preferences prefs;
@@ -109,7 +113,15 @@ class ForumRepository {
 
   Future<ResultApiModel?> requestToJoinGroup(forumId) async {
     final cityId = prefs.getKeyValue(Preferences.cityId, 0);
+    final userId = getLoggedInUserId();
+    // KeyHelper.generateAndStoreRSAKeyPair(userId as String);
+    // final publicKey = await KeyHelper.getPublicKey(userId as String);
+    // Map<String, dynamic> params = {
+    //   "publicKey": publicKey,
+    // };
+    // final response = await Api.requestToJoinGroup(forumId, cityId, params);
     final response = await Api.requestToJoinGroup(forumId, cityId);
+
     if (response.success) {
       return response;
     } else {
@@ -120,15 +132,144 @@ class ForumRepository {
 
   Future<ResultApiModel?> requestGroupDetails(forumId, cityId) async {
     int prefCityId = prefs.getKeyValue(Preferences.cityId, 0);
-    // if (cityId == 0) {
-    //   cityId = 1;
+    final userId = prefs.getKeyValue(Preferences.userId, 0);
+
+    // // Check if forum keys are already stored
+    // final storedForumKeyVersion =
+    //     await KeyHelper.getStoredForumKeyVersion(forumId.toString());
+    // if (storedForumKeyVersion == null) {
+    //   // Fetch forum keys
+    //   final forumKeysResponse = await Api.getForumKeys(
+    //       forumId: forumId, userId: userId, cityId: prefCityId, params: {});
+
+    //   if (forumKeysResponse.success) {
+    //     // Store the forum keys in secure storage
+    //     for (var forumKeyData in forumKeysResponse.data) {
+    //       final encryptedForumAesKey = forumKeyData['encryptedForumAesKey'];
+    //       final groupKeyVersion = forumKeyData['groupKeyVersion'].toString();
+
+    //       // Store the encrypted forum AES key
+    //       await KeyHelper.storeForumKey(
+    //         forumId: forumId.toString(),
+    //         groupKeyVersion: groupKeyVersion,
+    //         encryptedForumAesKey: encryptedForumAesKey,
+    //       );
+    //     }
+    //   } else {
+    //     logError('Failed to fetch forum keys', forumKeysResponse.message);
+    //     return null;
+    //   }
     // }
+
+    // // Retrieve and decrypt the forum AES key if not already decrypted
+    // final storedDecryptedAesKey =
+    //     await KeyHelper.getDecryptedForumAesKey(forumId.toString());
+    // if (storedDecryptedAesKey == null) {
+    //   final encryptedForumAesKey =
+    //       await KeyHelper.getStoredEncryptedForumAesKey(
+    //           forumId.toString(), storedForumKeyVersion ?? '');
+    //   if (encryptedForumAesKey != null) {
+    //     // Retrieve user's private key from local storage
+    //     final userPrivateKey = await KeyHelper.getPrivateKey(userId);
+
+    //     // Decrypt the forum AES key
+    //     final forumAesKey =
+    //         KeyHelper.decryptAESKey(encryptedForumAesKey, userPrivateKey);
+
+    //     // Store the decrypted forum AES key in local storage
+    //     await KeyHelper.storeDecryptedForumAesKey(
+    //         forumId.toString(), forumAesKey);
+    //   } else {
+    //     logError('Encrypted forum AES key not found');
+    //     return null;
+    //   }
+    // }
+
+    // Fetch group details
     final response = await Api.requestGroupDetails(
         forumId, cityId != 0 ? cityId : prefCityId);
     if (response.success) {
       return response;
     } else {
       logError('Request Group Detail Response Failed', response.message);
+      return null;
+    }
+  }
+
+  Future<ResultApiModel?> requestChatMessages(
+      forumId, lastMessageId, offset) async {
+    int prefCityId = prefs.getKeyValue(Preferences.cityId, 0);
+    // Check if forum keys are already stored
+    final storedForumKeyVersion =
+        await KeyHelper.getStoredForumKeyVersion(forumId.toString());
+
+    // Fetch forum keys if not already stored
+    final forumKeysResponse = await Api.getForumKeys(
+        forumId: forumId,
+        userId: prefs.getKeyValue(Preferences.userId, 0),
+        cityId: prefCityId,
+        params: {});
+
+    if (forumKeysResponse.success) {
+      // Store the forum keys in secure storage
+      for (var forumKeyData in forumKeysResponse.data) {
+        await KeyHelper.storeForumKey(
+          forumId: forumId.toString(),
+          groupKeyVersion: forumKeyData['groupKeyVersion'].toString(),
+          encryptedForumAesKey: forumKeyData['encryptedForumAesKey'],
+        );
+      }
+    } else {
+      logError('Failed to fetch forum keys', forumKeysResponse.message);
+      return null;
+    }
+
+    // Fetch chat messages
+    final response = await Api.getForumChatMessages(
+        forumId: forumId,
+        cityId: prefCityId,
+        lastMessageId: lastMessageId,
+        offset: offset);
+
+    if (response.success) {
+      // Decrypt messages
+      final List<ChatMessageModel> messages = [];
+      final forumKeyVersion = storedForumKeyVersion ??
+          response.data.first['groupKeyVersion'].toString();
+      final encryptedForumAesKey =
+          await KeyHelper.getStoredEncryptedForumAesKey(
+              forumId.toString(), forumKeyVersion);
+      final userId = prefs.getKeyValue(Preferences.userId, 0);
+      if (encryptedForumAesKey != null) {
+        final userPrivateKeyPem = await KeyHelper.getPrivateKey(userId);
+        final userPrivateKey =
+            RsaKeyHelper().parsePrivateKeyFromPem(userPrivateKeyPem);
+        final forumAesKey =
+            KeyHelper.decryptAESKey(encryptedForumAesKey, userPrivateKey);
+
+        for (var messageData in response.data) {
+          final encryptedMessage = messageData['message'];
+
+          // Decrypt the message using the forum AES key
+          final decryptedMessage =
+              KeyHelper.decryptMessage(encryptedMessage, forumAesKey);
+
+          messages.add(ChatMessageModel(
+            id: messageData['id'],
+            forumId: messageData['forumId'],
+            userId: messageData['userId'],
+            decryptedMessage: decryptedMessage,
+            createdAt: messageData['createdAt'],
+          ));
+        }
+
+        return response;
+      } else {
+        logError('Failed to fetch encrypted AES key from storage');
+        return null;
+      }
+    } else {
+      logError('Request Chat Messages Failed', response.message);
       return null;
     }
   }
@@ -326,7 +467,7 @@ class ForumRepository {
     await Api.deleteImage(cityId, listingId);
   }
 
-  static Future<ProductModel?> loadProduct(cityId, id) async {
+  Future<ProductModel?> loadProduct(cityId, id) async {
     final response = await Api.requestProduct(cityId, id);
     if (response.success) {
       UtilLogger.log('ErrorReason', response.data);

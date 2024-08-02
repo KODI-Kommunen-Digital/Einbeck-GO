@@ -74,12 +74,12 @@ class _GroupDetailsLoadedState extends State<GroupDetailsLoaded> {
       if (result == null) return;
     }
     if (!mounted) return;
-    Navigator.pushNamed(context, Routes.addPosts,
-            arguments: {'isNewPost': true, 'item': widget.groupModel})
-        .then((value) async {
-      await context.read<GroupDetailsCubit>().onLoad();
-      setState(() {});
-    });
+    // Navigator.pushNamed(context, Routes.addPosts,
+    //         arguments: {'isNewPost': true, 'item': widget.groupModel})
+    //     .then((value) async {
+    //   await context.read<GroupDetailsCubit>().onLoad();
+    //   setState(() {});
+    // });
   }
 
   @override
@@ -189,7 +189,7 @@ class _GroupDetailsLoadedState extends State<GroupDetailsLoaded> {
                                 'isNewGroup': false,
                                 'forumDetails': widget.groupModel
                               }).then((value) async {
-                            await context.read<GroupDetailsCubit>().onLoad();
+                            // await context.read<GroupDetailsCubit>().onLoad();
                             setState(() {});
                           });
                         }
@@ -282,7 +282,7 @@ class _GroupDetailsLoadedState extends State<GroupDetailsLoaded> {
                               'isAdmin': widget.isAdmin,
                             },
                           ).then((value) async {
-                            await context.read<GroupDetailsCubit>().onLoad();
+                            // await context.read<GroupDetailsCubit>().onLoad();
                             setState(() {});
                           });
                         },

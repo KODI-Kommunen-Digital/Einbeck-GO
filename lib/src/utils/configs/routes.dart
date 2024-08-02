@@ -35,7 +35,6 @@ import 'package:heidi/src/presentation/main/home/forum/add_group_screen/cubit/ad
 import 'package:heidi/src/presentation/main/home/forum/list_groups/add_new_post/add_post_screen.dart';
 import 'package:heidi/src/presentation/main/home/forum/list_groups/add_new_post/cubit/add_post_cubit.dart';
 import 'package:heidi/src/presentation/main/home/forum/list_groups/chat/chat_screen.dart';
-import 'package:heidi/src/presentation/main/home/forum/list_groups/chat/cubit/chat_cubit.dart';
 import 'package:heidi/src/presentation/main/home/forum/list_groups/cubit/cubit.dart';
 import 'package:heidi/src/presentation/main/home/forum/list_groups/forum_image_zoom/forum_image_zoom_screen.dart';
 import 'package:heidi/src/presentation/main/home/forum/list_groups/group_details/cubit/group_details_cubit.dart';
@@ -419,14 +418,11 @@ class Routes {
             final Map<String, dynamic> arguments =
                 settings.arguments as Map<String, dynamic>;
             return BlocProvider(
-              create: (context) => ChatCubit(),
-              child: BlocProvider(
-                  create: (context) =>
-                      GroupDetailsCubit(context.read(), arguments['group']),
-                  child: ChatScreen(
-                    isAdmin: true,
-                  )),
-            );
+                create: (context) =>
+                    GroupDetailsCubit(context.read(), arguments['group']),
+                child: ChatScreen(
+                  isAdmin: true,
+                ));
           },
           fullscreenDialog: true,
         );

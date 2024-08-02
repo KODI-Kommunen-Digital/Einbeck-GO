@@ -1,65 +1,129 @@
+import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:pointycastle/api.dart';
 import 'package:pointycastle/asymmetric/api.dart';
+import 'package:pointycastle/asymmetric/rsa.dart';
 import 'package:rsa_encrypt/rsa_encrypt.dart';
-import 'package:encrypt/encrypt.dart';
+import 'package:encrypt/encrypt.dart' as encrypt;
 
 class KeyHelper {
   static const _storage = FlutterSecureStorage();
 
+  // static Future<void> generateAndStoreRSAKeyPair(String userId) async {
+  //   final keyPair = await RSA.generate(2048);
+
+  //   final publicKeyPem = keyPair.publicKey;
+  //   final privateKeyPem = keyPair.privateKey;
+
+  //   await storePublicKey(userId, publicKeyPem);
+  //   await storePrivateKey(userId, privateKeyPem);
+  // }
+
   // Store public key
-  static Future<void> storePublicKey(String publicKey) async {
-    await _storage.write(key: 'publicKey', value: publicKey);
+  static Future<void> storePublicKey(String userId, String publicKey) async {
+    await _storage.write(key: 'publicKey_$userId', value: publicKey);
   }
 
   // Store private key
-  static Future<void> storePrivateKey(String privateKey) async {
-    await _storage.write(key: 'privateKey', value: privateKey);
+  static Future<void> storePrivateKey(String userId, String privateKey) async {
+    await _storage.write(key: 'privateKey_$userId', value: privateKey);
   }
 
   // Retrieve public key
-  static Future<RSAPublicKey> getPublicKey() async {
-    final publicKeyPem = await _storage.read(key: 'publicKey');
-    if (publicKeyPem == null) {
-      throw Exception("Public key not found");
+  static Future<String> getPublicKey(String userId) async {
+    final publicKey = await _storage.read(key: 'publicKey_$userId');
+    if (publicKey == null) {
+      throw Exception("Public key not found in secure storage");
     }
-    return RsaKeyHelper().parsePublicKeyFromPem(publicKeyPem);
+    return publicKey;
   }
 
   // Retrieve private key
-  static Future<RSAPrivateKey> getPrivateKey() async {
-    final privateKeyPem = await _storage.read(key: 'privateKey');
-    if (privateKeyPem == null) {
-      throw Exception("Private key not found");
+  static Future<RSAPrivateKey> getPrivateKey(String userId) async {
+    final privateKey = await _storage.read(key: 'privateKey_$userId');
+    if (privateKey == null) {
+      throw Exception("Private key not found in secure storage");
     }
-    return RsaKeyHelper().parsePrivateKeyFromPem(privateKeyPem);
+    return RsaKeyHelper().parsePrivateKeyFromPem(privateKey);
   }
 
-  // Store forum private key
-  static Future<void> storeForumPrivateKey(String forumPrivateKey) async {
-    await _storage.write(key: 'forumPrivateKey', value: forumPrivateKey);
+  // Retrieve forum key from secure storage
+  static Future<String?> getForumKey({
+    required String forumId,
+    required String groupKeyVersion,
+  }) async {
+    final key = 'forumKey_${forumId}_$groupKeyVersion';
+    return await _storage.read(key: key);
   }
 
-  // Retrieve forum private key
-  static Future<RSAPrivateKey> getStoredForumPrivateKey() async {
-    final privateKeyPem = await _storage.read(key: 'forumPrivateKey');
-    if (privateKeyPem == null) {
-      throw Exception("Forum private key not found");
+  // Store decrypted forum AES key in secure storage
+  static Future<void> storeDecryptedForumAesKey(
+      String forumId, String aesKey) async {
+    await _storage.write(key: 'decryptedForumAesKey_$forumId', value: aesKey);
+  }
+
+  // Retrieve decrypted forum AES key from secure storage
+  static Future<String?> getDecryptedForumAesKey(String forumId) async {
+    return await _storage.read(key: 'decryptedForumAesKey_$forumId');
+  }
+
+  // Store forum key in secure storage
+  static Future<void> storeForumKey({
+    required String forumId,
+    required String groupKeyVersion,
+    required String encryptedForumAesKey,
+  }) async {
+    final key = 'forumKey_${forumId}_$groupKeyVersion';
+    await _storage.write(key: key, value: encryptedForumAesKey);
+  }
+
+  // Retrieve stored forum key version from secure storage
+  static Future<String?> getStoredForumKeyVersion(String forumId) async {
+    final keys = await _storage.readAll();
+    for (String key in keys.keys) {
+      if (key.startsWith('forumKey_${forumId}_')) {
+        return key.split('_').last;
+      }
     }
-    return RsaKeyHelper().parsePrivateKeyFromPem(privateKeyPem);
+    return null;
+  }
+
+  // Retrieve stored encrypted forum AES key from secure storage
+  static Future<String?> getStoredEncryptedForumAesKey(
+      String forumId, String groupKeyVersion) async {
+    final key = 'forumKey_${forumId}_$groupKeyVersion';
+    return await _storage.read(key: key);
   }
 
   // Decrypt AES key using user's private key
   static String decryptAESKey(
-      String encryptedAESKey, RSAPrivateKey userPrivateKey) {
-    final encrypter = Encrypter(RSA(privateKey: userPrivateKey));
-    return encrypter.decrypt(Encrypted.fromBase64(encryptedAESKey));
+      String encryptedForumAesKey, RSAPrivateKey userPrivateKey) {
+    const decoder = Base64Decoder();
+    final encryptedBytes = decoder.convert(encryptedForumAesKey);
+
+    final cipher = RSAEngine()
+      ..init(false, PrivateKeyParameter<RSAPrivateKey>(userPrivateKey));
+
+    final decryptedBytes = cipher.process(encryptedBytes);
+    return base64Encode(decryptedBytes);
   }
 
-  // Decrypt forum private key using AES key
-  static String decryptForumPrivateKey(
-      String encryptedForumPrivateKey, String aesKey) {
-    final encrypter = Encrypter(AES(Key.fromUtf8(aesKey)));
-    return encrypter.decrypt(Encrypted.fromBase64(encryptedForumPrivateKey),
-        iv: IV.fromLength(16));
+  // Decrypt message using the forum AES key
+  static String decryptMessage(String encryptedMessage, String forumAesKey) {
+    final parts = encryptedMessage.split(':');
+
+    final aesKey = base64.decode(forumAesKey);
+
+    final ivBytes = base64.decode(parts[0]);
+    final encryptedData = parts[1];
+    final encryptedBytes = base64.decode(encryptedData);
+    final iv = encrypt.IV(ivBytes);
+    final encrypted = encrypt.Encrypted(encryptedBytes);
+
+    final encrypter = encrypt.Encrypter(
+        encrypt.AES(encrypt.Key(aesKey), mode: encrypt.AESMode.cbc));
+
+    final decryptedBytes = encrypter.decryptBytes(encrypted, iv: iv);
+    return utf8.decode(decryptedBytes);
   }
 }

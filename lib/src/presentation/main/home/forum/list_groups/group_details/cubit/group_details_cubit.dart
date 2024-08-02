@@ -1,11 +1,18 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'dart:convert';
 import 'package:bloc/bloc.dart';
+import 'package:flutter/material.dart';
+import 'package:heidi/src/data/model/model_chat_message.dart';
 import 'package:heidi/src/data/model/model_forum_group.dart';
 import 'package:heidi/src/data/model/model_group_members.dart';
 import 'package:heidi/src/data/model/model_group_posts.dart';
+import 'package:heidi/src/data/remote/api/api.dart';
 import 'package:heidi/src/data/repository/forum_repository.dart';
 import 'package:heidi/src/data/repository/user_repository.dart';
+import 'package:heidi/src/utils/configs/preferences.dart';
 import 'package:intl/intl.dart';
-
+import 'package:loggy/loggy.dart';
 import 'group_details_state.dart';
 
 enum RemoveUser { error, removed, onlyAdmin, onlyUser }
@@ -13,13 +20,16 @@ enum RemoveUser { error, removed, onlyAdmin, onlyUser }
 class GroupDetailsCubit extends Cubit<GroupDetailsState> {
   final ForumRepository repo;
   final ForumGroupModel arguments;
+  late int forumId;
+  int offset = 1;
 
   GroupDetailsCubit(this.repo, this.arguments)
       : super(const GroupDetailsStateLoading()) {
-    onLoad();
+    forumId = arguments.id ?? 1;
+    onLoad(forumId);
   }
 
-  Future<void> onLoad() async {
+  Future<void> onLoad(int? forumId) async {
     final groupPostsList = <GroupPostsModel>[];
     final groupMembersList = <GroupMembersModel>[];
     bool isAdmin = false;
@@ -144,6 +154,167 @@ class GroupDetailsCubit extends Cubit<GroupDetailsState> {
       }
     } else {
       return RemoveUser.error;
+    }
+  }
+
+  Future<void> receivePublicMessages(int forumId, int? cityId) async {
+    final prefs = await Preferences.openBox();
+    int cityId = prefs.getKeyValue(Preferences.cityId, 0);
+    final requestGroupMembersResponse =
+        await repo.getGroupMembers(forumId, cityId);
+    final groupMembersList = <GroupMembersModel>[];
+    if (requestGroupMembersResponse?.data != null) {
+      for (final member in requestGroupMembersResponse!.data) {
+        groupMembersList.add(GroupMembersModel(
+          userId: member['userId'],
+          username: member['username'],
+          memberId: member['memberId'],
+          firstname: member['firstname'],
+          lastname: member['lastname'],
+          image: member['image'],
+          isAdmin: member['isAdmin'],
+          joinedAt: member['joinedAt'],
+        ));
+      }
+    }
+
+    // Create a map of user IDs to user details
+    final userMap = {
+      for (var member in groupMembersList) member.userId: member
+    };
+
+    // Fetch the messages
+    final response = await Api.getForumChatMessages(
+      forumId: forumId,
+      cityId: cityId,
+      lastMessageId: 0,
+      offset: 1,
+    );
+
+    if (response.data != null) {
+      final messages = (response.data as List)
+          .map((messageData) {
+            final message = ChatMessageModel.fromJson(messageData);
+            final user = userMap[message.senderId];
+            return message.copyWith(
+              username: user?.username,
+              avatarUrl: user?.image,
+              message: messageData['message'], // Set message
+            );
+          })
+          .toList()
+          .reversed
+          .toList();
+
+      final currentState = state;
+      if (currentState is GroupDetailsStateLoaded) {
+        emit(GroupDetailsState.messagesLoaded(
+          messages,
+          currentState.arguments,
+          currentState.isAdmin,
+          currentState.userId,
+        ));
+      } else if (currentState is GroupDetailsStateMessagesLoaded) {
+        emit(currentState.copyWith(messages: messages));
+      } else {
+        emit(GroupDetailsState.messagesLoaded(
+          messages,
+          arguments,
+          false, // You might want to determine the correct value for isAdmin
+          await UserRepository.getLoggedUserId(),
+        ));
+      }
+    }
+  }
+
+  Future<void> fetchOlderMessages(int forumId) async {
+    final prefs = await Preferences.openBox();
+    int cityId = prefs.getKeyValue(Preferences.cityId, 0);
+    final requestGroupMembersResponse =
+        await repo.getGroupMembers(forumId, cityId);
+    final groupMembersList = <GroupMembersModel>[];
+    if (requestGroupMembersResponse?.data != null) {
+      for (final member in requestGroupMembersResponse!.data) {
+        groupMembersList.add(GroupMembersModel(
+          userId: member['userId'],
+          username: member['username'],
+          memberId: member['memberId'],
+          firstname: member['firstname'],
+          lastname: member['lastname'],
+          image: member['image'],
+          isAdmin: member['isAdmin'],
+          joinedAt: member['joinedAt'],
+        ));
+      }
+    }
+
+    // Create a map of user IDs to user details
+    final userMap = {
+      for (var member in groupMembersList) member.userId: member
+    };
+
+    final currentState = state;
+    List<ChatMessageModel> currentMessages = [];
+
+    // Fetch the messages
+    final response = await Api.getForumChatMessages(
+      forumId: forumId,
+      cityId: cityId,
+      lastMessageId: 0,
+      offset: offset++,
+    );
+
+    if (response.data != null) {
+      final newMessages = (response.data as List)
+          .map((messageData) {
+            final message = ChatMessageModel.fromJson(messageData);
+            final user = userMap[message.senderId];
+            return message.copyWith(
+              username: user?.username,
+              avatarUrl: user?.image,
+              message: messageData['message'], // Set message
+            );
+          })
+          .where((newMessage) => !currentMessages
+              .any((existingMessage) => existingMessage.id == newMessage.id))
+          .toList()
+          .reversed
+          .toList();
+
+      if (currentState is GroupDetailsStateMessagesLoaded) {
+        emit(currentState
+            .copyWith(messages: [...currentMessages, ...newMessages]));
+      } else {
+        emit(GroupDetailsState.messagesLoaded(
+          newMessages,
+          arguments,
+          false,
+          await UserRepository.getLoggedUserId(),
+        ));
+      }
+    }
+  }
+
+  Future<void> sendPublicMessage(
+      BuildContext context, int forumId, String message) async {
+    final prefs = await Preferences.openBox();
+    int prefCityId = prefs.getKeyValue(Preferences.cityId, 0);
+    final request = jsonEncode({
+      'message': message,
+      'groupKeyVersion': 0,
+      'messageType': 1,
+    });
+
+    final response = await Api.sendChatMessage(
+        forumId: forumId, cityId: prefCityId, params: request);
+
+    if (response.success) {
+      await receivePublicMessages(forumId, prefCityId);
+    } else {
+      logError('Failed to send message', response.message);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to send message')),
+      );
     }
   }
 }
