@@ -272,7 +272,6 @@ class _ChatLoadedState extends State<ChatLoaded> {
               child: state.maybeWhen(
                 messagesLoaded: (messages, _, __, ___) => ChatMessageList(
                   scrollController: _scrollController,
-                  messages: messages,
                 ),
                 orElse: () => const Center(child: CircularProgressIndicator()),
               ),

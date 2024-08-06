@@ -230,68 +230,32 @@ class GroupDetailsCubit extends Cubit<GroupDetailsState> {
   Future<void> fetchOlderMessages(int forumId) async {
     final prefs = await Preferences.openBox();
     int cityId = prefs.getKeyValue(Preferences.cityId, 0);
-    final requestGroupMembersResponse =
-        await repo.getGroupMembers(forumId, cityId);
-    final groupMembersList = <GroupMembersModel>[];
-    if (requestGroupMembersResponse?.data != null) {
-      for (final member in requestGroupMembersResponse!.data) {
-        groupMembersList.add(GroupMembersModel(
-          userId: member['userId'],
-          username: member['username'],
-          memberId: member['memberId'],
-          firstname: member['firstname'],
-          lastname: member['lastname'],
-          image: member['image'],
-          isAdmin: member['isAdmin'],
-          joinedAt: member['joinedAt'],
-        ));
-      }
-    }
-
-    // Create a map of user IDs to user details
-    final userMap = {
-      for (var member in groupMembersList) member.userId: member
-    };
 
     final currentState = state;
-    List<ChatMessageModel> currentMessages = [];
+    if (currentState is! GroupDetailsStateMessagesLoaded) {
+      return;
+    }
 
+    List<ChatMessageModel> currentMessages = currentState.messages;
+    int lastMessageId = 0;
     // Fetch the messages
     final response = await Api.getForumChatMessages(
       forumId: forumId,
       cityId: cityId,
-      lastMessageId: 0,
-      offset: offset++,
+      lastMessageId: lastMessageId,
+      offset: ++offset,
     );
 
     if (response.data != null) {
       final newMessages = (response.data as List)
-          .map((messageData) {
-            final message = ChatMessageModel.fromJson(messageData);
-            final user = userMap[message.senderId];
-            return message.copyWith(
-              username: user?.username,
-              avatarUrl: user?.image,
-              message: messageData['message'], // Set message
-            );
-          })
-          .where((newMessage) => !currentMessages
-              .any((existingMessage) => existingMessage.id == newMessage.id))
+          .map((messageData) => ChatMessageModel.fromJson(messageData))
           .toList()
           .reversed
           .toList();
 
-      if (currentState is GroupDetailsStateMessagesLoaded) {
-        emit(currentState
-            .copyWith(messages: [...currentMessages, ...newMessages]));
-      } else {
-        emit(GroupDetailsState.messagesLoaded(
-          newMessages,
-          arguments,
-          false,
-          await UserRepository.getLoggedUserId(),
-        ));
-      }
+      final updatedMessages = [...newMessages, ...currentMessages];
+
+      emit(currentState.copyWith(messages: updatedMessages));
     }
   }
 

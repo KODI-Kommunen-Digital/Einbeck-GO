@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:heidi/src/data/model/model_chat_message.dart';
 import 'package:heidi/src/presentation/main/home/forum/list_groups/group_details/cubit/group_details_cubit.dart';
 import 'package:heidi/src/presentation/main/home/forum/list_groups/group_details/cubit/group_details_state.dart';
 
 class ChatMessageList extends StatefulWidget {
   final ScrollController scrollController;
-  final List<ChatMessageModel> messages;
 
   const ChatMessageList({
     super.key,
     required this.scrollController,
-    required this.messages,
   });
 
   @override
@@ -36,23 +33,17 @@ class _ChatMessageListState extends State<ChatMessageList> {
         isLoading = true;
       });
 
-      // Save the current scroll position
       double currentScrollPosition = widget.scrollController.position.pixels;
-
-      // Save the current list height
       double currentListHeight =
           widget.scrollController.position.maxScrollExtent;
 
-      // Call the method to fetch older messages
       await context
           .read<GroupDetailsCubit>()
-          .fetchOlderMessages(widget.messages.first.forumId ?? 1);
+          .fetchOlderMessages(context.read<GroupDetailsCubit>().forumId);
 
-      // Calculate the new scroll position based on the height difference
       double newListHeight = widget.scrollController.position.maxScrollExtent;
       double heightDifference = newListHeight - currentListHeight;
 
-      // Restore the scroll position
       widget.scrollController.jumpTo(currentScrollPosition + heightDifference);
 
       setState(() {
@@ -70,8 +61,7 @@ class _ChatMessageListState extends State<ChatMessageList> {
 
   String formatDate(String dateStr) {
     final dateTime = DateTime.parse(dateStr);
-    return DateFormat('EEE MMM d yyyy, h:mm a', 'de')
-        .format(dateTime); // German date format
+    return DateFormat('EEE MMM d yyyy, h:mm a', 'de').format(dateTime);
   }
 
   @override
@@ -122,42 +112,31 @@ class _ChatMessageListState extends State<ChatMessageList> {
                               child: Text(
                                 message.username ?? 'Unknown',
                                 style: const TextStyle(
-                                  fontWeight: FontWeight.normal, // Not bold
+                                  fontWeight: FontWeight.normal,
                                   color: Colors.white,
                                 ),
                               ),
                             ),
-                          Align(
-                            alignment: isMe
-                                ? Alignment.centerRight
-                                : Alignment.centerLeft,
-                            child: Container(
-                              margin: const EdgeInsets.symmetric(vertical: 5),
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 10, horizontal: 14),
-                              constraints: BoxConstraints(
-                                maxWidth: MediaQuery.of(context).size.width *
-                                    0.5, // Smaller max width
+                          Container(
+                            margin: const EdgeInsets.symmetric(vertical: 5),
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 14),
+                            constraints: BoxConstraints(
+                              maxWidth: MediaQuery.of(context).size.width * 0.5,
+                            ),
+                            decoration: BoxDecoration(
+                              color: isMe
+                                  ? const Color(0xFFe5634d)
+                                  : const Color(0xFF202123),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              message.message ?? 'No message',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white,
                               ),
-                              decoration: BoxDecoration(
-                                color: isMe
-                                    ? const Color(0xFFe5634d)
-                                    : const Color(0xFF202123),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    message.message ?? 'No message',
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.white,
-                                    ),
-                                    softWrap: true, // Wrap text
-                                  ),
-                                ],
-                              ),
+                              softWrap: true,
                             ),
                           ),
                           Text(
@@ -170,13 +149,6 @@ class _ChatMessageListState extends State<ChatMessageList> {
                         ],
                       ),
                       if (isMe) const SizedBox(width: 10),
-                      // if (isMe)
-                      //   CircleAvatar(
-                      //     backgroundImage: NetworkImage(
-                      //       message.avatarUrl ??
-                      //           'https://smrauf1heidi.obs.eu-de.otc.t-systems.com/admin/ProfilePicture.png',
-                      //     ),
-                      //   ),
                     ],
                   ),
                 );
