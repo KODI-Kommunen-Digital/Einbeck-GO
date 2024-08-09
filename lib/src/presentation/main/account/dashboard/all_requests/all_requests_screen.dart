@@ -10,12 +10,14 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_cached_pdfview/flutter_cached_pdfview.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:heidi/src/data/model/model.dart';
+import 'package:heidi/src/data/model/model_multifilter.dart';
 import 'package:heidi/src/data/model/model_product.dart';
 import 'package:heidi/src/presentation/cubit/app_bloc.dart';
 import 'package:heidi/src/presentation/main/account/dashboard/all_requests/cubit/all_requests_cubit.dart';
 import 'package:heidi/src/presentation/main/account/dashboard/all_requests/cubit/all_requests_state.dart';
 import 'package:heidi/src/presentation/main/add_listing/cubit/add_listing_cubit.dart';
 import 'package:heidi/src/presentation/main/add_listing/cubit/add_listing_state.dart';
+import 'package:heidi/src/presentation/widget/app_filter_button.dart';
 import 'package:heidi/src/presentation/widget/app_placeholder.dart';
 import 'package:heidi/src/utils/configs/application.dart';
 import 'package:heidi/src/utils/configs/routes.dart';
@@ -114,6 +116,17 @@ class _AllRequestsLoadedState extends State<AllRequestsLoaded> {
         title: Text(
           Translate.of(context).translate('all_requests'),
         ),
+        actions: [
+          AppFilterButton(
+              multiFilter: MultiFilter(
+                  hasLocationFilter: true,
+                  cities: AppBloc.homeCubit.location,
+                  currentLocation: context.read<AllRequestsCubit>().currentCityFilter),
+              filterCallBack: (filter) async {
+                context.read<AllRequestsCubit>().currentCityFilter = filter.currentLocation;
+                context.read<AllRequestsCubit>().onLoad(false);
+              }),
+        ],
       ),
       body: Stack(children: [
         (posts?.isNotEmpty ?? false)

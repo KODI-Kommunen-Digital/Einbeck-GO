@@ -12,12 +12,18 @@ class AllRequestsCubit extends Cubit<AllRequestsState> {
   }
 
   dynamic posts;
+  int currentCityFilter = 0;
 
   Future<void> onLoad(bool isRefreshLoader) async {
     if (!isRefreshLoader) emit(const AllRequestsState.loading());
 
-    final ResultApiModel listingsRequestResponse =
-        await Api.requestStatusListings(3, 1);
+    late ResultApiModel listingsRequestResponse;
+    if (currentCityFilter == 0) {
+      listingsRequestResponse = await Api.requestStatusListings(3, 1);
+    } else {
+      listingsRequestResponse =
+          await Api.requestStatusLocList(currentCityFilter, 1, 3);
+    }
 
     posts = List.from(listingsRequestResponse.data ?? []).map((item) {
       return ProductModel.fromJson(item);
