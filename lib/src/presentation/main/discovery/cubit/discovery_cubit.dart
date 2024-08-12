@@ -61,7 +61,6 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
     emit(const DiscoveryState.loading());
     await onLoad(1);
     if (calledExternal) {
-      AppBloc.homeCubit.setCalledExternally(true);
       await AppBloc.homeCubit.onLoad(false);
     }
   }
@@ -224,7 +223,6 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
           arguments: 153),
     ];
   }
-
 
   Future<int?> getCitySelected() async {
     final prefs = await Preferences.openBox();

@@ -148,22 +148,6 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  Future<void> _setSavedCity(List<CategoryModel> location) async {
-    final savedCity = await AppBloc.homeCubit.checkSavedCity(location);
-    if (savedCity != null) {
-      setState(() {
-        selectedCityId = savedCity.id;
-        selectedCityTitle = savedCity.title;
-      });
-    } else {
-      await AppBloc.homeCubit.saveCityId(0);
-      setState(() {
-        selectedCityId = 0;
-      });
-    }
-    //AppBloc.homeCubit.onLoad(true);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -204,16 +188,17 @@ class _HomeScreenState extends State<HomeScreen> {
             isRefreshLoader = true;
             categoryLoading = false;
 
+            if(state.selectedCity != null) {
+              selectedCityTitle = state.selectedCity!.title;
+              selectedCityId = state.selectedCity!.id;
+            }
+
             if (location != null) {
               for (final ids in location!) {
                 cityTitles.add(ids.title.toString());
               }
               if (checkSavedCity) {
                 checkSavedCity = false;
-                _setSavedCity(location!);
-              } else if (AppBloc.homeCubit.getCalledExternally()) {
-                _setSavedCity(location!);
-                AppBloc.homeCubit.setCalledExternally(false);
               }
             }
             if (AppBloc.homeCubit.getDoesScroll()) {
@@ -228,10 +213,6 @@ class _HomeScreenState extends State<HomeScreen> {
             if (location!.isNotEmpty) {
               for (final ids in location!) {
                 cityTitles.add(ids.title.toString());
-              }
-              if (checkSavedCity) {
-                checkSavedCity = false;
-                _setSavedCity(location!);
               }
             }
           }

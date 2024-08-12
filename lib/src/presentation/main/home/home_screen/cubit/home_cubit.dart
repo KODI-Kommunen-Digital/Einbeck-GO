@@ -19,6 +19,7 @@ class HomeCubit extends Cubit<HomeState> {
   dynamic recent;
   dynamic sliders;
   dynamic categoryCount;
+  dynamic selectedCity;
   bool calledExternally = false;
   bool doesScroll = false;
 
@@ -64,6 +65,8 @@ class HomeCubit extends Cubit<HomeState> {
       return CategoryModel.fromJson(item);
     }).toList();
 
+    selectedCity = await checkSavedCity(location);
+
     const banner = Images.slider;
 
     List<CategoryModel> formattedCategories =
@@ -75,6 +78,7 @@ class HomeCubit extends Cubit<HomeState> {
       location,
       recent,
       isRefreshLoader,
+      selectedCity
     ));
   }
 
@@ -129,15 +133,8 @@ class HomeCubit extends Cubit<HomeState> {
       location,
       recent,
       false,
+      selectedCity
     ));
-  }
-
-  bool getCalledExternally() {
-    return calledExternally;
-  }
-
-  void setCalledExternally(bool called) {
-    calledExternally = called;
   }
 
   bool getDoesScroll() {
