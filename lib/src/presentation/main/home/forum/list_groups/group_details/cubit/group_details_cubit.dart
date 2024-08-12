@@ -2,6 +2,8 @@
 
 import 'dart:convert';
 import 'package:bloc/bloc.dart';
+import 'package:encrypt/encrypt.dart' as encrypt;
+import 'package:fast_rsa/fast_rsa.dart';
 import 'package:flutter/material.dart';
 import 'package:heidi/src/data/model/model_chat_message.dart';
 import 'package:heidi/src/data/model/model_forum_group.dart';
@@ -10,6 +12,7 @@ import 'package:heidi/src/data/model/model_group_posts.dart';
 import 'package:heidi/src/data/remote/api/api.dart';
 import 'package:heidi/src/data/repository/forum_repository.dart';
 import 'package:heidi/src/data/repository/user_repository.dart';
+import 'package:heidi/src/utils/configs/key_helper.dart';
 import 'package:heidi/src/utils/configs/preferences.dart';
 import 'package:intl/intl.dart';
 import 'package:loggy/loggy.dart';
@@ -22,10 +25,12 @@ class GroupDetailsCubit extends Cubit<GroupDetailsState> {
   final ForumGroupModel arguments;
   late int forumId;
   int offset = 1;
+  bool isPrivate = false; // Add this line
 
   GroupDetailsCubit(this.repo, this.arguments)
       : super(const GroupDetailsStateLoading()) {
     forumId = arguments.id ?? 1;
+    isPrivate = arguments.isPrivate == 1;
     onLoad(forumId);
   }
 
@@ -35,8 +40,8 @@ class GroupDetailsCubit extends Cubit<GroupDetailsState> {
     bool isAdmin = false;
     final requestGroupPostResponse =
         await repo.requestGroupPosts(arguments.id, arguments.cityId);
-    final requestGroupDetailResponse =
-        await repo.requestGroupDetails(arguments.id, arguments.cityId);
+    final requestGroupDetailResponse = await repo.requestGroupDetails(
+        arguments.id ?? 1, arguments.cityId ?? 1);
     final response = requestGroupDetailResponse!.data;
     final group = ForumGroupModel(
       id: response['id'],
@@ -192,39 +197,73 @@ class GroupDetailsCubit extends Cubit<GroupDetailsState> {
     );
 
     if (response.data != null) {
-      final messages = (response.data as List)
-          .map((messageData) {
-            final message = ChatMessageModel.fromJson(messageData);
-            final user = userMap[message.senderId];
-            return message.copyWith(
-              username: user?.username,
-              avatarUrl: user?.image,
-              message: messageData['message'], // Set message
-            );
-          })
-          .toList()
-          .reversed
-          .toList();
+      final messages =
+          await Future.wait((response.data as List).map((messageData) async {
+        final message = ChatMessageModel.fromJson(messageData);
+        final user = userMap[message.senderId];
+
+        String decryptedMessage = messageData['message'];
+        if (isPrivate) {
+          decryptedMessage =
+              await decryptPrivateMessage(messageData['message'], forumId);
+        }
+
+        return message.copyWith(
+          username: user?.username,
+          avatarUrl: user?.image,
+          message: decryptedMessage,
+        );
+      }));
+
+      final sortedMessages = messages.reversed.toList();
 
       final currentState = state;
       if (currentState is GroupDetailsStateLoaded) {
         emit(GroupDetailsState.messagesLoaded(
-          messages,
+          sortedMessages,
           currentState.arguments,
           currentState.isAdmin,
           currentState.userId,
         ));
       } else if (currentState is GroupDetailsStateMessagesLoaded) {
-        emit(currentState.copyWith(messages: messages));
+        emit(currentState.copyWith(messages: sortedMessages));
       } else {
         emit(GroupDetailsState.messagesLoaded(
-          messages,
+          sortedMessages,
           arguments,
-          false, // You might want to determine the correct value for isAdmin
+          false,
           await UserRepository.getLoggedUserId(),
         ));
       }
     }
+  }
+
+  Future<String> decryptPrivateMessage(
+      String encryptedMessage, int forumId) async {
+    final storedForumKeyVersion =
+        await KeyHelper.getStoredForumKeyVersion(forumId.toString());
+    if (storedForumKeyVersion == null) {
+      await fetchUserGroupKeys(forumId);
+    }
+
+    final updatedForumKeyVersion =
+        await KeyHelper.getStoredForumKeyVersion(forumId.toString());
+    if (updatedForumKeyVersion == null) {
+      throw Exception('No forum key version found');
+    }
+
+    final groupKey = await KeyHelper.getForumKey(
+      forumId: forumId.toString(),
+      groupKeyVersion: updatedForumKeyVersion,
+    );
+
+    if (groupKey == null) {
+      throw Exception('No group key found');
+    }
+
+    final decrypted = KeyHelper.decryptMessage(encryptedMessage, groupKey);
+    final decryptedJson = jsonDecode(decrypted);
+    return decryptedJson['message'];
   }
 
   Future<void> fetchOlderMessages(int forumId) async {
@@ -247,22 +286,45 @@ class GroupDetailsCubit extends Cubit<GroupDetailsState> {
     );
 
     if (response.data != null) {
-      final newMessages = (response.data as List)
-          .map((messageData) => ChatMessageModel.fromJson(messageData))
-          .toList()
-          .reversed
-          .toList();
+      final newMessages =
+          await Future.wait((response.data as List).map((messageData) async {
+        final message = ChatMessageModel.fromJson(messageData);
 
-      final updatedMessages = [...newMessages, ...currentMessages];
+        String decryptedMessage = messageData['message'];
+        if (isPrivate) {
+          decryptedMessage =
+              await decryptPrivateMessage(messageData['message'], forumId);
+        }
+
+        return message.copyWith(message: decryptedMessage);
+      }));
+
+      final updatedMessages = [...newMessages.reversed, ...currentMessages];
 
       emit(currentState.copyWith(messages: updatedMessages));
     }
   }
 
-  Future<void> sendPublicMessage(
+  Future<void> fetchUserGroupKeys(int forumId) async {
+    await repo.fetchUserGroupKeys(forumId);
+  }
+
+  Future<void> sendMessage(
       BuildContext context, int forumId, String message) async {
     final prefs = await Preferences.openBox();
     int prefCityId = prefs.getKeyValue(Preferences.cityId, 0);
+
+    if (isPrivate) {
+      await sendPrivateMessage(context, forumId, message, prefCityId);
+    } else {
+      await sendPublicMessage(context, forumId, message, prefCityId);
+    }
+
+    await receivePublicMessages(forumId, prefCityId);
+  }
+
+  Future<void> sendPublicMessage(
+      BuildContext context, int forumId, String message, int prefCityId) async {
     final request = jsonEncode({
       'message': message,
       'groupKeyVersion': 0,
@@ -272,13 +334,80 @@ class GroupDetailsCubit extends Cubit<GroupDetailsState> {
     final response = await Api.sendChatMessage(
         forumId: forumId, cityId: prefCityId, params: request);
 
-    if (response.success) {
-      await receivePublicMessages(forumId, prefCityId);
-    } else {
-      logError('Failed to send message', response.message);
+    if (!response.success) {
+      logError('Failed to send public message', response.message);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Failed to send message')),
       );
     }
+  }
+
+  Future<void> sendPrivateMessage(
+      BuildContext context, int forumId, String message, int prefCityId) async {
+    final userId = await UserRepository.getLoggedUserId();
+    final privateKeyPem = await KeyHelper.getPrivateKey(userId.toString());
+
+    List<int> messageBytes = utf8.encode(message);
+    var signMessage = await RSA.signPKCS1v15(
+        base64Encode(messageBytes), Hash.MD5, privateKeyPem);
+
+    final storedForumKeyVersion =
+        await KeyHelper.getStoredForumKeyVersion(forumId.toString());
+    String? latestGroupKey;
+
+    if (storedForumKeyVersion == null) {
+      await fetchUserGroupKeys(forumId);
+    }
+
+    final updatedForumKeyVersion =
+        await KeyHelper.getStoredForumKeyVersion(forumId.toString());
+    if (updatedForumKeyVersion != null) {
+      latestGroupKey = await KeyHelper.getForumKey(
+        forumId: forumId.toString(),
+        groupKeyVersion: updatedForumKeyVersion,
+      );
+    }
+
+    if (latestGroupKey == null) {
+      logError('Failed to get latest group key', 'Latest group key is null');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Failed to send message: No valid group key')),
+      );
+      return;
+    }
+
+    String encryptedMessage = await groupEncrypt(
+        jsonEncode({
+          'message': message,
+          'signature': signMessage,
+        }),
+        latestGroupKey);
+
+    final request = jsonEncode({
+      'message': encryptedMessage,
+      'groupKeyVersion': int.parse(updatedForumKeyVersion!),
+      'messageType': 1,
+    });
+
+    final response = await Api.sendChatMessage(
+        forumId: forumId, cityId: prefCityId, params: request);
+
+    if (!response.success) {
+      logError('Failed to send private message', response.message);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to send message')),
+      );
+    }
+  }
+
+  Future<String> groupEncrypt(String message, String groupKey) async {
+    final iv = encrypt.IV.fromSecureRandom(16);
+    final key = encrypt.Key(base64Decode(groupKey));
+    final encrypter =
+        encrypt.Encrypter(encrypt.AES(key, mode: encrypt.AESMode.cbc));
+
+    final encrypted = encrypter.encrypt(message, iv: iv);
+    return "${iv.base64}:${encrypted.base64}";
   }
 }

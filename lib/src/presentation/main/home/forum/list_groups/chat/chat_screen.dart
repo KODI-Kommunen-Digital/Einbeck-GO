@@ -278,7 +278,7 @@ class _ChatLoadedState extends State<ChatLoaded> {
             ),
             ChatInput(
               onSend: (text) {
-                context.read<GroupDetailsCubit>().sendPublicMessage(
+                context.read<GroupDetailsCubit>().sendMessage(
                       context,
                       widget.group.id ?? 1,
                       text,

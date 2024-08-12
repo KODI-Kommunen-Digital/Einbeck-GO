@@ -68,8 +68,7 @@ class Api {
   }
 
   static Future<ResultApiModel> requestMyListings(pageNo) async {
-    final result = await HTTPManager(forum: false)
-        .get(url: 'users/myListings');
+    final result = await HTTPManager(forum: false).get(url: 'users/myListings');
     return ResultApiModel.fromJson(result);
   }
 
@@ -109,11 +108,11 @@ class Api {
   //   return ResultApiModel.fromJson(result);
   // }
 
-  static Future<ResultApiModel> requestToJoinGroup(forumId, cityId) async {
+  static Future<ResultApiModel> requestToJoinGroup(
+      forumId, cityId, params) async {
     final filepath = "cities/$cityId/forums/$forumId/memberRequests";
-    final result = await HTTPManager(forum: true).post(
-      url: filepath,
-    );
+    final result =
+        await HTTPManager(forum: true).post(url: filepath, data: params);
     return ResultApiModel.fromJson(result);
   }
 
@@ -505,7 +504,8 @@ class Api {
       if (cityId != 0 && cityId != null) {
         var list =
             '/listings?categoryId=$params&statusId=1&pageNo=$pageNo&pageSize=19&sortByStartDate=true&cityId=$cityId&showExternalListings=$showExternalListings';
-        final result = await HTTPManager(forum: false).get(url: list, loading: true);
+        final result =
+            await HTTPManager(forum: false).get(url: list, loading: true);
         return ResultApiModel.fromJson(result);
       } else {
         var list =
@@ -668,6 +668,15 @@ class Api {
       required Map<String, dynamic> params}) async {
     final String filepath =
         "/cities/$cityId/forums/$forumId/members/get-forum-keys";
+    final result = await HTTPManager(forum: true).post(
+      url: filepath,
+    );
+    return ResultApiModel.fromJson(result);
+  }
+
+  static Future<ResultApiModel> updateForumKeys(
+      {required Map<String, dynamic> params}) async {
+    const String filepath = "/users/update-key";
     final result = await HTTPManager(forum: true).post(
       url: filepath,
       data: params,

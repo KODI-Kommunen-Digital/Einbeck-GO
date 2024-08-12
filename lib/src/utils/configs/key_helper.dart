@@ -3,21 +3,23 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:pointycastle/api.dart';
 import 'package:pointycastle/asymmetric/api.dart';
 import 'package:pointycastle/asymmetric/rsa.dart';
-import 'package:rsa_encrypt/rsa_encrypt.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
+import 'package:fast_rsa/fast_rsa.dart';
 
 class KeyHelper {
   static const _storage = FlutterSecureStorage();
 
-  // static Future<void> generateAndStoreRSAKeyPair(String userId) async {
-  //   final keyPair = await RSA.generate(2048);
+  static Future<void> generateAndStoreRSAKeyPair(String userId) async {
+    var keyPair = await RSA.generate(2048);
+    await storePublicKey(userId, keyPair.publicKey);
+    await storePrivateKey(userId, keyPair.privateKey);
+  }
 
-  //   final publicKeyPem = keyPair.publicKey;
-  //   final privateKeyPem = keyPair.privateKey;
-
-  //   await storePublicKey(userId, publicKeyPem);
-  //   await storePrivateKey(userId, privateKeyPem);
-  // }
+  static Future<bool> checkIfKeyExists(String userId) async {
+    final publicKey = await _storage.read(key: 'publicKey_$userId');
+    final privateKey = await _storage.read(key: 'privateKey_$userId');
+    return publicKey != null && privateKey != null;
+  }
 
   // Store public key
   static Future<void> storePublicKey(String userId, String publicKey) async {
@@ -38,13 +40,13 @@ class KeyHelper {
     return publicKey;
   }
 
-  // Retrieve private key
-  static Future<RSAPrivateKey> getPrivateKey(String userId) async {
+  // Retrieve private key as a PEM-encoded string
+  static Future<String> getPrivateKey(String userId) async {
     final privateKey = await _storage.read(key: 'privateKey_$userId');
     if (privateKey == null) {
       throw Exception("Private key not found in secure storage");
     }
-    return RsaKeyHelper().parsePrivateKeyFromPem(privateKey);
+    return privateKey;
   }
 
   // Retrieve forum key from secure storage
