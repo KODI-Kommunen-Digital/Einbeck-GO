@@ -46,9 +46,9 @@ class HomeCubit extends Cubit<HomeState> {
     category = List.from(categoryRequestResponse.data ?? []).map((item) {
       return CategoryModel.fromJson(item);
     }).toList();
-    CategoryModel? savedCity = await checkSavedCity(location);
-    if (savedCity != null) {
-      final listingsRequestResponse = await Api.requestLocList(savedCity.id, 1);
+    selectedCity = await checkSavedCity(location);
+    if (selectedCity != null) {
+      final listingsRequestResponse = await Api.requestLocList(selectedCity.id, 1);
       recent = List.from(listingsRequestResponse.data ?? []).map((item) {
         return ProductModel.fromJson(item);
       }).toList();
@@ -59,18 +59,16 @@ class HomeCubit extends Cubit<HomeState> {
       }).toList();
     }
     final categoryCountRequestResponse =
-        await Api.requestCategoryCount(savedCity?.id);
+        await Api.requestCategoryCount(selectedCity?.id);
     categoryCount =
         List.from(categoryCountRequestResponse.data ?? []).map((item) {
       return CategoryModel.fromJson(item);
     }).toList();
 
-    selectedCity = await checkSavedCity(location);
-
     const banner = Images.slider;
 
     List<CategoryModel> formattedCategories =
-        await formatCategoriesList(category, categoryCount, savedCity?.id);
+        await formatCategoriesList(category, categoryCount, selectedCity?.id);
 
     emit(HomeStateLoaded(
       banner,

@@ -188,9 +188,12 @@ class _HomeScreenState extends State<HomeScreen> {
             isRefreshLoader = true;
             categoryLoading = false;
 
-            if(state.selectedCity != null) {
+            if (state.selectedCity != null) {
               selectedCityTitle = state.selectedCity!.title;
               selectedCityId = state.selectedCity!.id;
+            } else {
+              selectedCityTitle = Translate.of(context).translate('select_location');
+              selectedCityId = 0;
             }
 
             if (location != null) {
@@ -281,11 +284,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                   .translate('select_location')) {
                             setState(() {
                               selectedCityId = 0;
+                              selectedCityTitle = Translate.of(context)
+                                  .translate('select_location');
                             });
-                            _onUpdateCategory();
-                            AppBloc.homeCubit.saveCityId(selectedCityId);
+                            await AppBloc.homeCubit.saveCityId(selectedCityId);
                             await AppBloc.discoveryCubit
                                 .onLocationFilter(selectedCityId, false);
+
+                            _onUpdateCategory();
                             break;
                           }
                         }

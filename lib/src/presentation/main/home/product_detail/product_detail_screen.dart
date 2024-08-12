@@ -1102,7 +1102,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           leading: IconButton(
             icon: Icon(
               Icons.arrow_back,
-              color: Theme.of(context).iconTheme.color,
+              color: Theme.of(context).primaryColor,
             ),
             onPressed: () {
               Navigator.of(context).pop();
