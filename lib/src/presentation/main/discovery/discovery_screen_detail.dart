@@ -30,8 +30,6 @@ class _DiscoveryScreenState extends State<DiscoveryScreenDetail> {
       context.read<DiscoveryCubit>().initializeServices14();
     } else if (id == 15) {
       context.read<DiscoveryCubit>().initializeServices15();
-    } else if (id == 16) {
-      context.read<DiscoveryCubit>().initializeServices16();
     }
     loadLocationList();
   }

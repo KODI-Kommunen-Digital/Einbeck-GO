@@ -1053,6 +1053,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               ),
               child: AppUserInfo(
                 user: userDetail,
+                showEmail: false,
                 onPressed: () async {
                   final loggedInUserId = await context
                       .read<ProductDetailCubit>()

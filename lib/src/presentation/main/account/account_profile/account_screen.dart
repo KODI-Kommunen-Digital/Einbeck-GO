@@ -123,6 +123,7 @@ class _AccountLoadedState extends State<AccountLoaded> {
                     ),
                     child: AppUserInfo(
                       user: user,
+                      showEmail: true,
                       type: UserViewType.information,
                       onPressed: () {
                         Navigator.pushNamed(context, Routes.profile,
@@ -198,6 +199,19 @@ class _AccountLoadedState extends State<AccountLoaded> {
                       title: Translate.of(context).translate('faq'),
                       onPressed: () {
                         _onNavigate(Routes.faq);
+                      },
+                      trailing: RotatedBox(
+                        quarterTurns: AppLanguage.isRTL() ? 2 : 0,
+                        child: const Icon(
+                          Icons.keyboard_arrow_right,
+                          textDirection: TextDirection.ltr,
+                        ),
+                      ),
+                    ),
+                    AppListTitle(
+                      title: "Netiquette",
+                      onPressed: () {
+                        _onNavigate(Routes.netiquetteScreen);
                       },
                       trailing: RotatedBox(
                         quarterTurns: AppLanguage.isRTL() ? 2 : 0,

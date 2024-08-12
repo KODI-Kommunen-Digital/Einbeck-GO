@@ -214,6 +214,7 @@ class _PostDetailsLoadedState extends State<PostDetailsLoaded> {
                     ],
                   ),
                   child: AppUserInfo(
+                    showEmail: false,
                     user: widget.userDetail,
                     onPressed: () async {
                       final loggedInUserId = await context

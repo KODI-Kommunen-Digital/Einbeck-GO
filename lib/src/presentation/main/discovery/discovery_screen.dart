@@ -203,10 +203,6 @@ class _DiscoveryLoadedState extends State<DiscoveryLoaded> {
       await Navigator.pushNamed(context, Routes.discoveryDetail, arguments: {
         'id': 15,
       });
-    } else if (service.imageLink == "16") {
-      await Navigator.pushNamed(context, Routes.discoveryDetail, arguments: {
-        'id': 16,
-      });
     } else if (service.imageLink == "17") {
       await launchUrl(Uri.parse('https://pages.et4.de/de/einbeck/wlan/portal'),
           mode: LaunchMode.inAppWebView);

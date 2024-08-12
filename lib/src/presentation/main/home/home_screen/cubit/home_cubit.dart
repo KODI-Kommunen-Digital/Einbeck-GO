@@ -182,6 +182,16 @@ class HomeCubit extends Cubit<HomeState> {
     //     element.hide = false;
     //   }
     // }
+    for (var category in categories) {
+      if (category.id != 1 &&
+          category.id != 17 &&
+          category.id != 6 &&
+          category.id != 4) {
+        category.hide = true;
+      } else {
+        category.hide = false;
+      }
+    }
 
     return categories;
   }

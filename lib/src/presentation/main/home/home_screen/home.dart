@@ -175,7 +175,11 @@ class _HomeScreenState extends State<HomeScreen> {
               onPressed: () {
                 _searchListings();
               },
-              icon: const Icon(Icons.search))
+              icon: Icon(
+                Icons.search,
+                color: Theme.of(context).textTheme.bodyLarge?.color ??
+                    Colors.white,
+              ))
         ],
       ),
       extendBodyBehindAppBar: true,
@@ -518,10 +522,6 @@ class _HomeScreenState extends State<HomeScreen> {
         await Navigator.pushNamed(context, Routes.discoveryDetail, arguments: {
           'id': 15,
         });
-      } else if (item.id == 16) {
-        await Navigator.pushNamed(context, Routes.discoveryDetail, arguments: {
-          'id': 16,
-        });
       } else if (item.id == 18) {
         await launchUrl(
             Uri.parse('https://pages.et4.de/de/einbeck/wlan/portal'),
@@ -743,12 +743,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     .titleMedium!
                     .copyWith(fontWeight: FontWeight.bold),
               ),
-              Text(
-                Translate.of(context).translate(
-                  'let_find_interesting',
-                ),
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
             ],
           ),
         ),
@@ -831,12 +825,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     .textTheme
                     .titleMedium!
                     .copyWith(fontWeight: FontWeight.bold),
-              ),
-              Text(
-                Translate.of(context).translate(
-                  'what_happen',
-                ),
-                style: Theme.of(context).textTheme.bodyMedium,
               ),
             ],
           ),

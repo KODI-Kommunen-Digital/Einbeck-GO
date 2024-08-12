@@ -32,8 +32,6 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
       services = initializeServices14();
     } else if (id == 15) {
       services = initializeServices15();
-    } else if (id == 16) {
-      services = initializeServices16();
     }
     // services = initializeServices();
 
@@ -133,6 +131,16 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
           arguments: 5,
           categoryId: 3),
       CitizenServiceModel(
+          imageUrl: Images.service6,
+          imageLink: "6",
+          arguments: 6,
+          categoryId: 4),
+      CitizenServiceModel(
+          imageUrl: Images.service3,
+          imageLink: "3",
+          arguments: 3,
+          categoryId: 16),
+      CitizenServiceModel(
           imageUrl: Images.service8,
           imageLink: "8",
           arguments: 8,
@@ -158,11 +166,6 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
           imageLink: "9",
           arguments: 9,
           categoryId: 6),
-      CitizenServiceModel(
-          imageUrl: Images.service16,
-          imageLink: "16",
-          arguments: 9,
-          categoryId: 0),
       // CitizenServiceModel(
       //     imageUrl: Images.service6,
       //     imageLink: "6",
@@ -222,25 +225,6 @@ class DiscoveryCubit extends Cubit<DiscoveryState> {
     ];
   }
 
-  List<CitizenServiceModel> initializeServices16() {
-    return [
-      CitizenServiceModel(
-          imageUrl: Images.service16_1,
-          imageLink: "16",
-          arguments: 161,
-          categoryId: 0),
-      CitizenServiceModel(
-          imageUrl: Images.service16_2,
-          imageLink: "16",
-          arguments: 162,
-          categoryId: 0),
-      CitizenServiceModel(
-          imageUrl: Images.service16_3,
-          imageLink: "16",
-          categoryId: 0,
-          arguments: 163),
-    ];
-  }
 
   Future<int?> getCitySelected() async {
     final prefs = await Preferences.openBox();
