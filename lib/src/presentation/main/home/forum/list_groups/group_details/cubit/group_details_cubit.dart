@@ -24,8 +24,8 @@ class GroupDetailsCubit extends Cubit<GroupDetailsState> {
   final ForumRepository repo;
   final ForumGroupModel arguments;
   late int forumId;
-  int offset = 1;
-  bool isPrivate = false; // Add this line
+  int _currentOffset = 1;
+  bool isPrivate = false;
 
   GroupDetailsCubit(this.repo, this.arguments)
       : super(const GroupDetailsStateLoading()) {
@@ -183,12 +183,10 @@ class GroupDetailsCubit extends Cubit<GroupDetailsState> {
       }
     }
 
-    // Create a map of user IDs to user details
     final userMap = {
       for (var member in groupMembersList) member.userId: member
     };
 
-    // Fetch the messages
     final response = await Api.getForumChatMessages(
       forumId: forumId,
       cityId: cityId,
@@ -236,6 +234,51 @@ class GroupDetailsCubit extends Cubit<GroupDetailsState> {
         ));
       }
     }
+    _currentOffset = 2;
+  }
+
+  Future<void> fetchOlderMessages(int forumId) async {
+    final prefs = await Preferences.openBox();
+    int cityId = prefs.getKeyValue(Preferences.cityId, 0);
+
+    final currentState = state;
+    if (currentState is! GroupDetailsStateMessagesLoaded) {
+      return;
+    }
+
+    List<ChatMessageModel> currentMessages = currentState.messages;
+
+    final response = await Api.getForumChatMessages(
+      forumId: forumId,
+      cityId: cityId,
+      lastMessageId: currentMessages.isNotEmpty ? currentMessages.last.id : 0,
+      offset: _currentOffset,
+    );
+
+    if (response.data != null) {
+      final newMessages =
+          await Future.wait((response.data as List).map((messageData) async {
+        final message = ChatMessageModel.fromJson(messageData);
+
+        String decryptedMessage = messageData['message'];
+        if (isPrivate) {
+          decryptedMessage =
+              await decryptPrivateMessage(messageData['message'], forumId);
+        }
+
+        return message.copyWith(message: decryptedMessage);
+      }));
+
+      // Combine new messages with current messages, maintaining the correct order
+      final updatedMessages = [...currentMessages, ...newMessages];
+
+      emit(currentState.copyWith(messages: updatedMessages));
+      _currentOffset++;
+    }
+  }
+
+  void resetOffset() {
+    _currentOffset = 1;
   }
 
   Future<String> decryptPrivateMessage(
@@ -264,45 +307,6 @@ class GroupDetailsCubit extends Cubit<GroupDetailsState> {
     final decrypted = KeyHelper.decryptMessage(encryptedMessage, groupKey);
     final decryptedJson = jsonDecode(decrypted);
     return decryptedJson['message'];
-  }
-
-  Future<void> fetchOlderMessages(int forumId) async {
-    final prefs = await Preferences.openBox();
-    int cityId = prefs.getKeyValue(Preferences.cityId, 0);
-
-    final currentState = state;
-    if (currentState is! GroupDetailsStateMessagesLoaded) {
-      return;
-    }
-
-    List<ChatMessageModel> currentMessages = currentState.messages;
-    int lastMessageId = 0;
-    // Fetch the messages
-    final response = await Api.getForumChatMessages(
-      forumId: forumId,
-      cityId: cityId,
-      lastMessageId: lastMessageId,
-      offset: ++offset,
-    );
-
-    if (response.data != null) {
-      final newMessages =
-          await Future.wait((response.data as List).map((messageData) async {
-        final message = ChatMessageModel.fromJson(messageData);
-
-        String decryptedMessage = messageData['message'];
-        if (isPrivate) {
-          decryptedMessage =
-              await decryptPrivateMessage(messageData['message'], forumId);
-        }
-
-        return message.copyWith(message: decryptedMessage);
-      }));
-
-      final updatedMessages = [...newMessages.reversed, ...currentMessages];
-
-      emit(currentState.copyWith(messages: updatedMessages));
-    }
   }
 
   Future<void> fetchUserGroupKeys(int forumId) async {

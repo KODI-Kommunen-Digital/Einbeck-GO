@@ -98,16 +98,6 @@ class Api {
     return ResultApiModel.fromJson(result);
   }
 
-  // static Future<ResultApiModel> requestToJoinGroup(
-  //     forumId, cityId, params) async {
-  //   final filepath = "cities/$cityId/forums/$forumId/memberRequests";
-  //   final result = await HTTPManager(forum: true).post(
-  //     url: filepath,
-  //     data: params,
-  //   );
-  //   return ResultApiModel.fromJson(result);
-  // }
-
   static Future<ResultApiModel> requestToJoinGroup(
       forumId, cityId, params) async {
     final filepath = "cities/$cityId/forums/$forumId/memberRequests";
@@ -687,7 +677,7 @@ class Api {
   static Future<ResultApiModel> getForumChatMessages(
       {required int forumId,
       required int cityId,
-      required int lastMessageId,
+      required int? lastMessageId,
       required int offset}) async {
     final String filepath =
         "/cities/$cityId/forums/$forumId/chat?lastMessageId=$lastMessageId&offset=$offset";

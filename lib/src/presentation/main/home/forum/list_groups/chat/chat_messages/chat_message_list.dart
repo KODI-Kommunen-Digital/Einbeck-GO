@@ -6,10 +6,12 @@ import 'package:heidi/src/presentation/main/home/forum/list_groups/group_details
 
 class ChatMessageList extends StatefulWidget {
   final ScrollController scrollController;
+  final FocusNode inputFocusNode;
 
   const ChatMessageList({
     super.key,
     required this.scrollController,
+    required this.inputFocusNode,
   });
 
   @override
@@ -18,44 +20,34 @@ class ChatMessageList extends StatefulWidget {
 
 class _ChatMessageListState extends State<ChatMessageList> {
   bool isLoading = false;
-  bool isInitialLoad = true;
 
   @override
   void initState() {
     super.initState();
     widget.scrollController.addListener(_scrollListener);
-    WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
+  }
+
+  @override
+  void dispose() {
+    widget.scrollController.removeListener(_scrollListener);
+    super.dispose();
   }
 
   Future<void> _scrollListener() async {
-    if (widget.scrollController.position.pixels == 0 && !isLoading) {
+    if (widget.scrollController.position.pixels ==
+            widget.scrollController.position.maxScrollExtent &&
+        !isLoading) {
       setState(() {
         isLoading = true;
       });
-
-      double currentScrollPosition = widget.scrollController.position.pixels;
-      double currentListHeight =
-          widget.scrollController.position.maxScrollExtent;
 
       await context
           .read<GroupDetailsCubit>()
           .fetchOlderMessages(context.read<GroupDetailsCubit>().forumId);
 
-      double newListHeight = widget.scrollController.position.maxScrollExtent;
-      double heightDifference = newListHeight - currentListHeight;
-
-      widget.scrollController.jumpTo(currentScrollPosition + heightDifference);
-
       setState(() {
         isLoading = false;
       });
-    }
-  }
-
-  void _scrollToBottom() {
-    if (widget.scrollController.hasClients) {
-      widget.scrollController
-          .jumpTo(widget.scrollController.position.maxScrollExtent);
     }
   }
 
@@ -70,20 +62,22 @@ class _ChatMessageListState extends State<ChatMessageList> {
       builder: (context, state) {
         return state.maybeWhen(
           messagesLoaded: (messages, group, isAdmin, userId) {
-            if (isInitialLoad) {
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                if (widget.scrollController.hasClients) {
-                  widget.scrollController
-                      .jumpTo(widget.scrollController.position.maxScrollExtent);
-                }
-              });
-              isInitialLoad = false;
-            }
             return ListView.builder(
               controller: widget.scrollController,
-              itemCount: messages.length,
+              itemCount: messages.length + 1,
+              reverse: false,
               itemBuilder: (context, index) {
-                final message = messages[index];
+                if (index == 0) {
+                  return isLoading
+                      ? const Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: CircularProgressIndicator(),
+                          ),
+                        )
+                      : const SizedBox.shrink();
+                }
+                final message = messages[index - 1];
                 final isMe = message.senderId == userId;
                 return Padding(
                   padding:
@@ -122,7 +116,7 @@ class _ChatMessageListState extends State<ChatMessageList> {
                             padding: const EdgeInsets.symmetric(
                                 vertical: 10, horizontal: 14),
                             constraints: BoxConstraints(
-                              maxWidth: MediaQuery.of(context).size.width * 0.5,
+                              maxWidth: MediaQuery.of(context).size.width * 0.7,
                             ),
                             decoration: BoxDecoration(
                               color: isMe
@@ -159,11 +153,5 @@ class _ChatMessageListState extends State<ChatMessageList> {
         );
       },
     );
-  }
-
-  @override
-  void dispose() {
-    widget.scrollController.removeListener(_scrollListener);
-    super.dispose();
   }
 }

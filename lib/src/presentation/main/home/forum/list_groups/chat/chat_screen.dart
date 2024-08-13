@@ -80,6 +80,8 @@ class _ChatLoadedState extends State<ChatLoaded> {
   Timer? pingTimer;
   String _websocketPings = "";
   final ScrollController _scrollController = ScrollController();
+  final FocusNode _inputFocusNode = FocusNode();
+
   bool isLoading = false;
 
   @override
@@ -88,7 +90,6 @@ class _ChatLoadedState extends State<ChatLoaded> {
     _fetchMessages(isInitialLoad: true);
     _connectWebsocket(widget.group.cityId ?? 1, widget.group.id);
     WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
-    _scrollController.addListener(_scrollListener);
   }
 
   @override
@@ -97,24 +98,10 @@ class _ChatLoadedState extends State<ChatLoaded> {
     if (pingTimer != null) {
       pingTimer?.cancel();
     }
+    _scrollController.dispose();
+    _inputFocusNode.dispose();
+    context.read<GroupDetailsCubit>().resetOffset();
     super.dispose();
-  }
-
-  Future<void> _scrollListener() async {
-    if (_scrollController.position.atEdge &&
-        _scrollController.position.pixels == 0) {
-      if (!isLoading) {
-        setState(() {
-          isLoading = true;
-        });
-        await context
-            .read<GroupDetailsCubit>()
-            .fetchOlderMessages(widget.group.id ?? 1);
-        setState(() {
-          isLoading = false;
-        });
-      }
-    }
   }
 
   Future<void> _connectWebsocket(int? cityId, int? forumId) async {
@@ -266,27 +253,28 @@ class _ChatLoadedState extends State<ChatLoaded> {
             ),
           ],
         ),
-        body: Column(
-          children: [
-            Expanded(
-              child: state.maybeWhen(
-                messagesLoaded: (messages, _, __, ___) => ChatMessageList(
+        body: SafeArea(
+          child: Column(
+            children: [
+              Expanded(
+                child: ChatMessageList(
                   scrollController: _scrollController,
+                  inputFocusNode: _inputFocusNode,
                 ),
-                orElse: () => const Center(child: CircularProgressIndicator()),
               ),
-            ),
-            ChatInput(
-              onSend: (text) {
-                context.read<GroupDetailsCubit>().sendMessage(
-                      context,
-                      widget.group.id ?? 1,
-                      text,
-                    );
-                _scrollToBottom();
-              },
-            ),
-          ],
+              ChatInput(
+                onSend: (text) {
+                  context.read<GroupDetailsCubit>().sendMessage(
+                        context,
+                        widget.group.id ?? 1,
+                        text,
+                      );
+                  _scrollToBottom();
+                },
+                focusNode: _inputFocusNode,
+              ),
+            ],
+          ),
         ),
       );
     });
@@ -295,7 +283,7 @@ class _ChatLoadedState extends State<ChatLoaded> {
   void _scrollToBottom() {
     if (_scrollController.hasClients) {
       _scrollController.animateTo(
-        _scrollController.position.maxScrollExtent,
+        0,
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeOut,
       );

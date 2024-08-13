@@ -1,62 +1,50 @@
 import 'package:flutter/material.dart';
 
 class ChatInput extends StatefulWidget {
-  final Function(String text) onSend;
+  final Function(String) onSend;
+  final FocusNode focusNode;
 
-  const ChatInput({super.key, required this.onSend});
+  const ChatInput({super.key, required this.onSend, required this.focusNode});
 
   @override
   _ChatInputState createState() => _ChatInputState();
 }
 
 class _ChatInputState extends State<ChatInput> {
-  final _editingController = TextEditingController();
-
-  void _onSend() {
-    if (_editingController.text.isNotEmpty) {
-      widget.onSend(_editingController.text);
-      _editingController.clear();
-    }
-  }
+  final TextEditingController _controller = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0), // Move it up a bit
-      child: Container(
-        padding: const EdgeInsets.all(8.0),
-        decoration: BoxDecoration(
-          color: Theme.of(context).cardColor,
-          boxShadow: [
-            BoxShadow(
-              color: Theme.of(context).shadowColor.withOpacity(.1),
-              spreadRadius: 4,
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Row(
-          children: <Widget>[
-            Expanded(
-              child: TextField(
-                decoration: const InputDecoration(
-                  hintText: 'Geben Sie Ihre Nachricht ein...',
-                  border: InputBorder.none,
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _controller,
+              focusNode: widget.focusNode,
+              decoration: InputDecoration(
+                hintText: 'Type a message...',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(20.0),
                 ),
-                controller: _editingController,
-                onSubmitted: (value) {
-                  _onSend();
-                },
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               ),
             ),
-            IconButton(
-              icon: Icon(Icons.send,
-                  color: Theme.of(context).colorScheme.primary),
-              onPressed: _onSend,
-            ),
-          ],
-        ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.send),
+            color: const Color(0xFFe5634d),
+            onPressed: () {
+              if (_controller.text.isNotEmpty) {
+                widget.onSend(_controller.text);
+                _controller.clear();
+                widget.focusNode.requestFocus();
+              }
+            },
+          ),
+        ],
       ),
     );
   }
