@@ -265,8 +265,8 @@ class _ChatLoadedState extends State<ChatLoaded> {
                 ),
               ),
               ChatInput(
-                onSend: (text) {
-                  context.read<GroupDetailsCubit>().sendMessage(
+                onSend: (text) async {
+                  await context.read<GroupDetailsCubit>().sendMessage(
                         context,
                         widget.group.id ?? 1,
                         text,
@@ -285,7 +285,7 @@ class _ChatLoadedState extends State<ChatLoaded> {
   void _scrollToBottom() {
     if (_scrollController.hasClients) {
       _scrollController.animateTo(
-        0,
+        _scrollController.position.maxScrollExtent,
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeOut,
       );
