@@ -470,6 +470,7 @@ class _AppUploadImageState extends State<AppUploadImage> {
               padding: const EdgeInsets.all(16),
               child: Text(
                 widget.title!,
+                textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             );
@@ -593,6 +594,9 @@ class _AppUploadImageState extends State<AppUploadImage> {
               images.remove(imageFile);
               resultList.remove(asset);
             });
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text(
+                    Translate.of(context).translate('select_small_images'))));
             if (!mounted) return;
             context.read<AddListingCubit>().removeAssets(asset);
 

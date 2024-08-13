@@ -44,7 +44,7 @@ class AppTheme {
   ].map((item) => ThemeModel.fromJson(item)).toList();
 
   ///Dark Theme option
-  static DarkOption darkThemeOption = DarkOption.alwaysOn;
+  static DarkOption darkThemeOption = DarkOption.alwaysOff;
 
   ///Get theme data
   static ThemeData getTheme({
@@ -84,6 +84,7 @@ class AppTheme {
         backgroundColor: Colors.white.withAlpha(30),
         foregroundColor: isDark ? Colors.white : Colors.black,
         shadowColor: isDark ? null : colorScheme.onSurface.withOpacity(0.2),
+        iconTheme: IconThemeData(color: colorScheme.primary)
       ),
       canvasColor: colorScheme.surface,
       scaffoldBackgroundColor: colorScheme.surface,

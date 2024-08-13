@@ -231,7 +231,7 @@ class _ListProductScreenState extends State<ListProductScreen> {
                           onPressed: () {
                             _searchListings();
                           },
-                          icon: const Icon(Icons.search))
+                          icon: Icon(Icons.search, color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,))
                     ],
                   );
                 }

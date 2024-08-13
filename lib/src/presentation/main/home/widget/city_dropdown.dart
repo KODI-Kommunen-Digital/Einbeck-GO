@@ -125,6 +125,14 @@ class _CitiesDropDownState extends State<CitiesDropDown> {
   }
 
   @override
+  void didUpdateWidget(covariant CitiesDropDown oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if(widget.selectedOption != null && widget.selectedOption != oldWidget.selectedOption) {
+      _controller.text = widget.selectedOption!;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final textColor = isDarkMode ? Colors.white : Colors.black;

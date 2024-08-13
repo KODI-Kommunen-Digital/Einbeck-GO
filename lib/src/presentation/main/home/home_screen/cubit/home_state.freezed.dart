@@ -26,7 +26,8 @@ mixin _$HomeState {
             List<CategoryModel> category,
             List<CategoryModel> location,
             List<ProductModel> recent,
-            bool isRefreshLoader)
+            bool isRefreshLoader,
+            CategoryModel? selectedCity)
         loaded,
     required TResult Function(String error) error,
   }) =>
@@ -41,7 +42,8 @@ mixin _$HomeState {
             List<CategoryModel> category,
             List<CategoryModel> location,
             List<ProductModel> recent,
-            bool isRefreshLoader)?
+            bool isRefreshLoader,
+            CategoryModel? selectedCity)?
         loaded,
     TResult? Function(String error)? error,
   }) =>
@@ -56,7 +58,8 @@ mixin _$HomeState {
             List<CategoryModel> category,
             List<CategoryModel> location,
             List<ProductModel> recent,
-            bool isRefreshLoader)?
+            bool isRefreshLoader,
+            CategoryModel? selectedCity)?
         loaded,
     TResult Function(String error)? error,
     required TResult orElse(),
@@ -155,7 +158,8 @@ class _$HomeStateInitialImpl implements HomeStateInitial {
             List<CategoryModel> category,
             List<CategoryModel> location,
             List<ProductModel> recent,
-            bool isRefreshLoader)
+            bool isRefreshLoader,
+            CategoryModel? selectedCity)
         loaded,
     required TResult Function(String error) error,
   }) {
@@ -173,7 +177,8 @@ class _$HomeStateInitialImpl implements HomeStateInitial {
             List<CategoryModel> category,
             List<CategoryModel> location,
             List<ProductModel> recent,
-            bool isRefreshLoader)?
+            bool isRefreshLoader,
+            CategoryModel? selectedCity)?
         loaded,
     TResult? Function(String error)? error,
   }) {
@@ -191,7 +196,8 @@ class _$HomeStateInitialImpl implements HomeStateInitial {
             List<CategoryModel> category,
             List<CategoryModel> location,
             List<ProductModel> recent,
-            bool isRefreshLoader)?
+            bool isRefreshLoader,
+            CategoryModel? selectedCity)?
         loaded,
     TResult Function(String error)? error,
     required TResult orElse(),
@@ -293,7 +299,8 @@ class _$HomeStateLoadingImpl implements HomeStateLoading {
             List<CategoryModel> category,
             List<CategoryModel> location,
             List<ProductModel> recent,
-            bool isRefreshLoader)
+            bool isRefreshLoader,
+            CategoryModel? selectedCity)
         loaded,
     required TResult Function(String error) error,
   }) {
@@ -311,7 +318,8 @@ class _$HomeStateLoadingImpl implements HomeStateLoading {
             List<CategoryModel> category,
             List<CategoryModel> location,
             List<ProductModel> recent,
-            bool isRefreshLoader)?
+            bool isRefreshLoader,
+            CategoryModel? selectedCity)?
         loaded,
     TResult? Function(String error)? error,
   }) {
@@ -329,7 +337,8 @@ class _$HomeStateLoadingImpl implements HomeStateLoading {
             List<CategoryModel> category,
             List<CategoryModel> location,
             List<ProductModel> recent,
-            bool isRefreshLoader)?
+            bool isRefreshLoader,
+            CategoryModel? selectedCity)?
         loaded,
     TResult Function(String error)? error,
     required TResult orElse(),
@@ -469,7 +478,8 @@ class _$HomeStatecategoryLoadingImpl implements HomeStatecategoryLoading {
             List<CategoryModel> category,
             List<CategoryModel> location,
             List<ProductModel> recent,
-            bool isRefreshLoader)
+            bool isRefreshLoader,
+            CategoryModel? selectedCity)
         loaded,
     required TResult Function(String error) error,
   }) {
@@ -487,7 +497,8 @@ class _$HomeStatecategoryLoadingImpl implements HomeStatecategoryLoading {
             List<CategoryModel> category,
             List<CategoryModel> location,
             List<ProductModel> recent,
-            bool isRefreshLoader)?
+            bool isRefreshLoader,
+            CategoryModel? selectedCity)?
         loaded,
     TResult? Function(String error)? error,
   }) {
@@ -505,7 +516,8 @@ class _$HomeStatecategoryLoadingImpl implements HomeStatecategoryLoading {
             List<CategoryModel> category,
             List<CategoryModel> location,
             List<ProductModel> recent,
-            bool isRefreshLoader)?
+            bool isRefreshLoader,
+            CategoryModel? selectedCity)?
         loaded,
     TResult Function(String error)? error,
     required TResult orElse(),
@@ -578,7 +590,8 @@ abstract class _$$HomeStateLoadedImplCopyWith<$Res> {
       List<CategoryModel> category,
       List<CategoryModel> location,
       List<ProductModel> recent,
-      bool isRefreshLoader});
+      bool isRefreshLoader,
+      CategoryModel? selectedCity});
 }
 
 /// @nodoc
@@ -597,6 +610,7 @@ class __$$HomeStateLoadedImplCopyWithImpl<$Res>
     Object? location = null,
     Object? recent = null,
     Object? isRefreshLoader = null,
+    Object? selectedCity = freezed,
   }) {
     return _then(_$HomeStateLoadedImpl(
       null == banner
@@ -619,6 +633,10 @@ class __$$HomeStateLoadedImplCopyWithImpl<$Res>
           ? _value.isRefreshLoader
           : isRefreshLoader // ignore: cast_nullable_to_non_nullable
               as bool,
+      freezed == selectedCity
+          ? _value.selectedCity
+          : selectedCity // ignore: cast_nullable_to_non_nullable
+              as CategoryModel?,
     ));
   }
 }
@@ -631,7 +649,8 @@ class _$HomeStateLoadedImpl implements HomeStateLoaded {
       final List<CategoryModel> category,
       final List<CategoryModel> location,
       final List<ProductModel> recent,
-      this.isRefreshLoader)
+      this.isRefreshLoader,
+      this.selectedCity)
       : _category = category,
         _location = location,
         _recent = recent;
@@ -664,10 +683,12 @@ class _$HomeStateLoadedImpl implements HomeStateLoaded {
 
   @override
   final bool isRefreshLoader;
+  @override
+  final CategoryModel? selectedCity;
 
   @override
   String toString() {
-    return 'HomeState.loaded(banner: $banner, category: $category, location: $location, recent: $recent, isRefreshLoader: $isRefreshLoader)';
+    return 'HomeState.loaded(banner: $banner, category: $category, location: $location, recent: $recent, isRefreshLoader: $isRefreshLoader, selectedCity: $selectedCity)';
   }
 
   @override
@@ -680,7 +701,9 @@ class _$HomeStateLoadedImpl implements HomeStateLoaded {
             const DeepCollectionEquality().equals(other._location, _location) &&
             const DeepCollectionEquality().equals(other._recent, _recent) &&
             (identical(other.isRefreshLoader, isRefreshLoader) ||
-                other.isRefreshLoader == isRefreshLoader));
+                other.isRefreshLoader == isRefreshLoader) &&
+            (identical(other.selectedCity, selectedCity) ||
+                other.selectedCity == selectedCity));
   }
 
   @override
@@ -690,7 +713,8 @@ class _$HomeStateLoadedImpl implements HomeStateLoaded {
       const DeepCollectionEquality().hash(_category),
       const DeepCollectionEquality().hash(_location),
       const DeepCollectionEquality().hash(_recent),
-      isRefreshLoader);
+      isRefreshLoader,
+      selectedCity);
 
   @JsonKey(ignore: true)
   @override
@@ -710,11 +734,13 @@ class _$HomeStateLoadedImpl implements HomeStateLoaded {
             List<CategoryModel> category,
             List<CategoryModel> location,
             List<ProductModel> recent,
-            bool isRefreshLoader)
+            bool isRefreshLoader,
+            CategoryModel? selectedCity)
         loaded,
     required TResult Function(String error) error,
   }) {
-    return loaded(banner, category, location, recent, isRefreshLoader);
+    return loaded(
+        banner, category, location, recent, isRefreshLoader, selectedCity);
   }
 
   @override
@@ -728,11 +754,13 @@ class _$HomeStateLoadedImpl implements HomeStateLoaded {
             List<CategoryModel> category,
             List<CategoryModel> location,
             List<ProductModel> recent,
-            bool isRefreshLoader)?
+            bool isRefreshLoader,
+            CategoryModel? selectedCity)?
         loaded,
     TResult? Function(String error)? error,
   }) {
-    return loaded?.call(banner, category, location, recent, isRefreshLoader);
+    return loaded?.call(
+        banner, category, location, recent, isRefreshLoader, selectedCity);
   }
 
   @override
@@ -746,13 +774,15 @@ class _$HomeStateLoadedImpl implements HomeStateLoaded {
             List<CategoryModel> category,
             List<CategoryModel> location,
             List<ProductModel> recent,
-            bool isRefreshLoader)?
+            bool isRefreshLoader,
+            CategoryModel? selectedCity)?
         loaded,
     TResult Function(String error)? error,
     required TResult orElse(),
   }) {
     if (loaded != null) {
-      return loaded(banner, category, location, recent, isRefreshLoader);
+      return loaded(
+          banner, category, location, recent, isRefreshLoader, selectedCity);
     }
     return orElse();
   }
@@ -804,13 +834,15 @@ abstract class HomeStateLoaded implements HomeState {
       final List<CategoryModel> category,
       final List<CategoryModel> location,
       final List<ProductModel> recent,
-      final bool isRefreshLoader) = _$HomeStateLoadedImpl;
+      final bool isRefreshLoader,
+      final CategoryModel? selectedCity) = _$HomeStateLoadedImpl;
 
   String get banner;
   List<CategoryModel> get category;
   List<CategoryModel> get location;
   List<ProductModel> get recent;
   bool get isRefreshLoader;
+  CategoryModel? get selectedCity;
   @JsonKey(ignore: true)
   _$$HomeStateLoadedImplCopyWith<_$HomeStateLoadedImpl> get copyWith =>
       throw _privateConstructorUsedError;
@@ -889,7 +921,8 @@ class _$HomeStateErrorImpl implements HomeStateError {
             List<CategoryModel> category,
             List<CategoryModel> location,
             List<ProductModel> recent,
-            bool isRefreshLoader)
+            bool isRefreshLoader,
+            CategoryModel? selectedCity)
         loaded,
     required TResult Function(String error) error,
   }) {
@@ -907,7 +940,8 @@ class _$HomeStateErrorImpl implements HomeStateError {
             List<CategoryModel> category,
             List<CategoryModel> location,
             List<ProductModel> recent,
-            bool isRefreshLoader)?
+            bool isRefreshLoader,
+            CategoryModel? selectedCity)?
         loaded,
     TResult? Function(String error)? error,
   }) {
@@ -925,7 +959,8 @@ class _$HomeStateErrorImpl implements HomeStateError {
             List<CategoryModel> category,
             List<CategoryModel> location,
             List<ProductModel> recent,
-            bool isRefreshLoader)?
+            bool isRefreshLoader,
+            CategoryModel? selectedCity)?
         loaded,
     TResult Function(String error)? error,
     required TResult orElse(),
