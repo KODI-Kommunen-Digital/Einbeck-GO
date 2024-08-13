@@ -213,7 +213,7 @@ class GroupDetailsCubit extends Cubit<GroupDetailsState> {
         );
       }));
 
-      final sortedMessages = messages.reversed.toList();
+      final sortedMessages = messages.toList();
 
       final currentState = state;
       if (currentState is GroupDetailsStateLoaded) {

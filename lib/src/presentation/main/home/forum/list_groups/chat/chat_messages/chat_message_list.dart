@@ -65,7 +65,7 @@ class _ChatMessageListState extends State<ChatMessageList> {
             return ListView.builder(
               controller: widget.scrollController,
               itemCount: messages.length + 1,
-              reverse: false,
+              reverse: true,
               itemBuilder: (context, index) {
                 if (index == 0) {
                   return isLoading
