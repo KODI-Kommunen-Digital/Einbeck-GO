@@ -145,7 +145,6 @@ class _ListGroupScreenState extends State<ListGroupScreen> {
                   onPressed: _onAddGroup,
                   icon: const Icon(
                     Icons.add,
-                    color: Colors.white,
                   ),
                 ),
               ),
