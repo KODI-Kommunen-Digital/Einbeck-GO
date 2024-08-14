@@ -128,7 +128,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           image: _file ?? _image,
                           onChange: (result) {
                             setState(() {
-                              print(result[0].path);
                               if (result.isNotEmpty) {
                                 if (result[0].path.contains('profilePic')) {
                                   _image = result[0].path;
