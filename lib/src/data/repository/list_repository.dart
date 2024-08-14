@@ -172,8 +172,8 @@ class ListRepository {
     });
     if (profile) {
       await prefs.setPickedFile(formData);
-      // final response = await Api.requestUploadImage(formData);
-      // return response;
+      final response = await Api.requestUploadImage(formData);
+      return response;
     } else if (!profile) {
       await prefs.setPickedFile(formData);
     }

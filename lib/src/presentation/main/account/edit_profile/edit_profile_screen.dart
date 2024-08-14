@@ -32,6 +32,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   final picker = ImagePicker();
 
   String? _image;
+  String? _file;
   String? _errorUName;
   String? _errorFName;
   String? _errorLName;
@@ -124,11 +125,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           type: UploadImageType.circle,
                           profile: true,
                           forumGroup: false,
-                          image: _image,
+                          image: _file ?? _image,
                           onChange: (result) {
                             setState(() {
+                              print(result[0].path);
                               if (result.isNotEmpty) {
-                                // _image = result[0];
+                                if (result[0].path.contains('profilePic')) {
+                                  _image = result[0].path;
+                                } else {
+                                  _file = result[0].path;
+                                }
                               }
                             });
                           },
