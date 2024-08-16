@@ -94,6 +94,7 @@ class AppTheme {
       dialogBackgroundColor: colorScheme.surface,
       indicatorColor: indicatorColor,
       applyElevationOverlayColor: isDark,
+      shadowColor: const Color(0xFFa39f94),
 
       ///Custom
       fontFamily: font,

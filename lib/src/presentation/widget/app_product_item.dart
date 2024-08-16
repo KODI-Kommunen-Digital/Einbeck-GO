@@ -147,7 +147,7 @@ class AppProductItem extends StatelessWidget {
                           item!.endDate.isNotEmpty,
                       child: Container(
                         decoration: BoxDecoration(
-                          color: Colors.white30,
+                          color: Theme.of(context).shadowColor,
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Padding(
@@ -167,7 +167,7 @@ class AppProductItem extends StatelessWidget {
                           item!.startDate.isNotEmpty && item!.endDate == "",
                       child: Container(
                         decoration: BoxDecoration(
-                          color: Colors.white30,
+                          color: Theme.of(context).shadowColor,
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Padding(
@@ -186,7 +186,7 @@ class AppProductItem extends StatelessWidget {
                       visible: item?.categoryId == 1,
                       child: Container(
                         decoration: BoxDecoration(
-                          color: Colors.white30,
+                          color: Theme.of(context).shadowColor,
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Padding(
@@ -457,7 +457,7 @@ class AppProductItem extends StatelessWidget {
                           Container(
                             padding: const EdgeInsets.all(3.5),
                             decoration: BoxDecoration(
-                              color: Colors.white30,
+                              color: Theme.of(context).shadowColor,
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: Text(

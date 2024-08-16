@@ -107,7 +107,6 @@ class _ChatMessageListState extends State<ChatMessageList> {
                                 message.username ?? 'Unknown',
                                 style: const TextStyle(
                                   fontWeight: FontWeight.normal,
-                                  color: Colors.white,
                                 ),
                               ),
                             ),
@@ -135,9 +134,9 @@ class _ChatMessageListState extends State<ChatMessageList> {
                           ),
                           Text(
                             formatDate(message.createdAt!),
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 12,
-                              color: Colors.white70,
+                              color: Theme.of(context).shadowColor,
                             ),
                           ),
                         ],
