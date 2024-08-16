@@ -157,7 +157,7 @@ class AppProductItem extends StatelessWidget {
                             style: Theme.of(context)
                                 .textTheme
                                 .bodySmall!
-                                .copyWith(fontWeight: FontWeight.bold),
+                                .copyWith(fontWeight: FontWeight.bold, color: Colors.white),
                           ),
                         ),
                       ),
@@ -177,7 +177,7 @@ class AppProductItem extends StatelessWidget {
                             style: Theme.of(context)
                                 .textTheme
                                 .bodySmall!
-                                .copyWith(fontWeight: FontWeight.bold),
+                                .copyWith(fontWeight: FontWeight.bold, color: Colors.white),
                           ),
                         ),
                       ),
@@ -196,7 +196,7 @@ class AppProductItem extends StatelessWidget {
                             style: Theme.of(context)
                                 .textTheme
                                 .bodySmall!
-                                .copyWith(fontWeight: FontWeight.bold),
+                                .copyWith(fontWeight: FontWeight.bold, color: Colors.white),
                           ),
                         ),
                       ),
@@ -468,7 +468,7 @@ class AppProductItem extends StatelessWidget {
                                   .textTheme
                                   .bodySmall!
                                   .copyWith(
-                                    fontWeight: FontWeight.bold,
+                                    fontWeight: FontWeight.bold, color: Colors.white,
                                   ),
                             ),
                           ),
