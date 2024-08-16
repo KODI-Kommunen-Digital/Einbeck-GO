@@ -81,7 +81,7 @@ class AppTheme {
       brightness: colorScheme.brightness,
       primaryColor: colorScheme.primary,
       appBarTheme: AppBarTheme(
-        backgroundColor: const Color(0xFFe1e1e1),
+        backgroundColor: isDark ? Colors.white.withAlpha(30) : const Color(0xFFe1e1e1),
         foregroundColor: isDark ? Colors.white : Colors.black,
         shadowColor: isDark ? null : colorScheme.onSurface.withOpacity(0.2),
         iconTheme: IconThemeData(color: colorScheme.primary)
