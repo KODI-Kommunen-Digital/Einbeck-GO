@@ -180,7 +180,7 @@ class _ForumGroupItemState extends State<ForumGroupItem> {
                           margin: const EdgeInsets.fromLTRB(0, 0, 50, 0),
                           padding: const EdgeInsets.all(2.0),
                           decoration: BoxDecoration(
-                            color: Colors.grey[300],
+                            color: Theme.of(context).appBarTheme.backgroundColor,
                             borderRadius: BorderRadius.circular(6.0),
                           ),
                           alignment: Alignment.center,
