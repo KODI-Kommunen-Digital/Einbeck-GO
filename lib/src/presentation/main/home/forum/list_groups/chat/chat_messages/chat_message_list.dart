@@ -41,9 +41,8 @@ class _ChatMessageListState extends State<ChatMessageList> {
         isLoading = true;
       });
 
-      await context
-          .read<GroupDetailsCubit>()
-          .fetchOlderMessages(context.read<GroupDetailsCubit>().forumId);
+      await context.read<GroupDetailsCubit>().fetchOlderMessages(
+          context, context.read<GroupDetailsCubit>().forumId);
 
       setState(() {
         isLoading = false;

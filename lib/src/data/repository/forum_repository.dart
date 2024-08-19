@@ -230,7 +230,6 @@ class ForumRepository {
       if (isPrivate) {
         return await decryptPrivateMessages(response, forumId, userId);
       } else {
-        // For public forums, return the messages as they are
         return response;
       }
     } else {
@@ -251,7 +250,7 @@ class ForumRepository {
 
     for (var messageData in response.data) {
       final encryptedMessage = messageData['message'];
-      final groupKeyVersion = messageData['groupKeyVersion'].toString();
+      final groupKeyVersion = messageData['groupKeyVersion'];
       String? groupKeyData = await KeyHelper.getForumKey(
         forumId: forumId.toString(),
         groupKeyVersion: groupKeyVersion,
@@ -286,7 +285,7 @@ class ForumRepository {
         message: response.message);
   }
 
-  Future<void> fetchUserGroupKeys(int forumId, {List<String>? version}) async {
+  Future<void> fetchUserGroupKeys(int forumId, {List<int>? version}) async {
     final int userId = prefs.getKeyValue(Preferences.userId, 0);
     final int cityId = prefs.getKeyValue(Preferences.cityId, 0);
 

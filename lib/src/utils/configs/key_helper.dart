@@ -52,7 +52,7 @@ class KeyHelper {
   // Retrieve forum key from secure storage
   static Future<String?> getForumKey({
     required String forumId,
-    required String groupKeyVersion,
+    required int groupKeyVersion,
   }) async {
     final key = 'forumKey_${forumId}_$groupKeyVersion';
     return await _storage.read(key: key);
@@ -79,15 +79,24 @@ class KeyHelper {
     await _storage.write(key: key, value: encryptedForumAesKey);
   }
 
-  // Retrieve stored forum key version from secure storage
-  static Future<String?> getStoredForumKeyVersion(String forumId) async {
+  static Future<int?> getStoredForumKeyVersion(String forumId) async {
     final keys = await _storage.readAll();
+    int? lastVersion;
+
     for (String key in keys.keys) {
       if (key.startsWith('forumKey_${forumId}_')) {
-        return key.split('_').last;
+        final currentVersionString = key.split('_').last;
+        final currentVersion = int.tryParse(currentVersionString);
+
+        if (currentVersion != null) {
+          if (lastVersion == null || currentVersion > lastVersion) {
+            lastVersion = currentVersion;
+          }
+        }
       }
     }
-    return null;
+
+    return lastVersion;
   }
 
   // Retrieve stored encrypted forum AES key from secure storage

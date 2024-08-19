@@ -658,9 +658,8 @@ class Api {
       required Map<String, dynamic> params}) async {
     final String filepath =
         "/cities/$cityId/forums/$forumId/members/get-forum-keys";
-    final result = await HTTPManager(forum: true).post(
-      url: filepath,
-    );
+    final result =
+        await HTTPManager(forum: true).post(url: filepath, data: params);
     return ResultApiModel.fromJson(result);
   }
 
@@ -680,7 +679,7 @@ class Api {
       required int? lastMessageId,
       required int offset}) async {
     final String filepath =
-        "/cities/$cityId/forums/$forumId/chat?lastMessageId=$lastMessageId&offset=$offset";
+        "/cities/$cityId/forums/$forumId/chat?offset=$offset";
     final result = await HTTPManager(forum: true).get(
       url: filepath,
     );

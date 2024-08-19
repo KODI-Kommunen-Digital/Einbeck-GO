@@ -141,6 +141,7 @@ class _ChatLoadedState extends State<ChatLoaded> {
   Future<void> _fetchMessages({required bool isInitialLoad}) async {
     // Implement the logic to fetch new messages and update the UI
     context.read<GroupDetailsCubit>().receivePublicMessages(
+        context,
         widget.group.id ?? 1,
         widget.group.cityId == 0 ? 1 : widget.group.cityId);
     if (isInitialLoad) {

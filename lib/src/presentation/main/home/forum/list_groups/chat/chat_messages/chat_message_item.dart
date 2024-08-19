@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:heidi/src/utils/configs/application.dart';
 
 class ChatMessageItem extends StatelessWidget {
   final String message;
@@ -24,7 +25,8 @@ class ChatMessageItem extends StatelessWidget {
       children: [
         if (!isMe)
           CircleAvatar(
-            backgroundImage: NetworkImage(avatarUrl),
+            backgroundImage:
+                NetworkImage("${Application.picturesURL}$avatarUrl"),
             radius: 20,
           ),
         const SizedBox(width: 10),
@@ -46,7 +48,7 @@ class ChatMessageItem extends StatelessWidget {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(8.0),
                   child: Image.network(
-                    imageUrl!,
+                    "${Application.picturesURL}$avatarUrl",
                     width: 200,
                   ),
                 ),
@@ -77,7 +79,8 @@ class ChatMessageItem extends StatelessWidget {
         if (isMe) const SizedBox(width: 10),
         if (isMe)
           CircleAvatar(
-            backgroundImage: NetworkImage(avatarUrl),
+            backgroundImage:
+                NetworkImage("${Application.picturesURL}$avatarUrl"),
             radius: 20,
           ),
       ],
