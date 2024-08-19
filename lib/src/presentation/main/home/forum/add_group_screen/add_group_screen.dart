@@ -341,10 +341,11 @@ class _AddGroupScreenState extends State<AddGroupScreen> {
                         Text(Translate.of(context).translate('select_privacy')),
                     value: selectedPrivacy,
                     items: [
-                      DropdownMenuItem(
-                        value: 'private',
-                        child: Text(Translate.of(context).translate('private')),
-                      ),
+                      ///TODO: Uncomment this when private chat is to be enabled
+                      // DropdownMenuItem(
+                      //   value: 'private',
+                      //   child: Text(Translate.of(context).translate('private')),
+                      // ),
                       DropdownMenuItem(
                         value: 'public',
                         child: Text(Translate.of(context).translate('public')),
