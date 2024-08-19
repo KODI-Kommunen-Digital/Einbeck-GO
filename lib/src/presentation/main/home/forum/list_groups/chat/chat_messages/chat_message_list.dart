@@ -4,6 +4,8 @@ import 'package:intl/intl.dart';
 import 'package:heidi/src/presentation/main/home/forum/list_groups/group_details/cubit/group_details_cubit.dart';
 import 'package:heidi/src/presentation/main/home/forum/list_groups/group_details/cubit/group_details_state.dart';
 
+import '../../../../../../../utils/configs/application.dart';
+
 class ChatMessageList extends StatefulWidget {
   final ScrollController scrollController;
   final FocusNode inputFocusNode;
@@ -89,8 +91,7 @@ class _ChatMessageListState extends State<ChatMessageList> {
                       if (!isMe)
                         CircleAvatar(
                           backgroundImage: NetworkImage(
-                            message.avatarUrl ??
-                                'https://smrauf1heidi.obs.eu-de.otc.t-systems.com/admin/ProfilePicture.png',
+                            '${Application.picturesURL}${message.avatarUrl}',
                           ),
                         ),
                       if (!isMe) const SizedBox(width: 10),

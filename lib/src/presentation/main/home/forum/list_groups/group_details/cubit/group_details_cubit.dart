@@ -248,7 +248,7 @@ class GroupDetailsCubit extends Cubit<GroupDetailsState> {
       processedMessages.add(
         message.copyWith(
           username: user?.username ?? "Unknown",
-          avatarUrl: user?.image,
+          avatarUrl: user?.image ?? "admin/ProfilePicture.png",
           message:
               decryptedMessage.isNotEmpty ? decryptedMessage : "No message",
         ),

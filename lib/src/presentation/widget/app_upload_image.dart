@@ -2,12 +2,10 @@
 
 import 'dart:io';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:device_info/device_info.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_cached_pdfview/flutter_cached_pdfview.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
@@ -240,9 +238,7 @@ class _AppUploadImageState extends State<AppUploadImage> {
         setState(() {
           isImageUploaded = false;
           _file = File(pickedFile.path);
-          if (_file != null) {
-            widget.onChange([_file!]);
-          }
+          widget.onChange([]);
         });
         final profile = widget.profile;
         final forumGroup = widget.forumGroup;
@@ -259,7 +255,7 @@ class _AppUploadImageState extends State<AppUploadImage> {
               isImageUploaded = true;
             });
             final item = response.data['data']?['image'];
-            widget.onChange([File(item)]);
+            widget.onChange(item);
           } else {
             logError('Image Upload Permission Error', response);
           }
@@ -392,7 +388,7 @@ class _AppUploadImageState extends State<AppUploadImage> {
                             isImageUploaded = true;
                           });
                           final item = response.data['data']?['image'];
-                          widget.onChange([File(item)]);
+                          widget.onChange(item);
                         }
                       }
                     }
@@ -437,29 +433,6 @@ class _AppUploadImageState extends State<AppUploadImage> {
               ),
             ));
       }
-    } else if (image != null && image!.contains('profilePic')) {
-      return SizedBox(
-          width: double.infinity,
-          height: 400,
-          child: RawGestureDetector(
-              gestures: {
-                AllowMultipleGestureRecognizer:
-                    GestureRecognizerFactoryWithHandlers<
-                        AllowMultipleGestureRecognizer>(
-                  () => AllowMultipleGestureRecognizer(),
-                  (AllowMultipleGestureRecognizer instance) {
-                    instance.onTap = () => showChooseFileTypeDialog();
-                  },
-                )
-              },
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(200),
-                child: CachedNetworkImage(
-                  imageUrl:
-                      "${Application.picturesURL}${image!}?cacheKey=$uniqueKey",
-                  fit: BoxFit.fill,
-                ),
-              )));
     }
     switch (widget.type) {
       case UploadImageType.circle:
@@ -496,7 +469,6 @@ class _AppUploadImageState extends State<AppUploadImage> {
               padding: const EdgeInsets.all(16),
               child: Text(
                 widget.title!,
-                textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             );
@@ -604,7 +576,7 @@ class _AppUploadImageState extends State<AppUploadImage> {
         for (XFile asset in resultListCopy) {
           //final ByteData byteData = await asset.getByteData();
           //final List<int> imageData = byteData.buffer.asUint8List();
-          final Uint8List imageData = await asset.readAsBytes();
+          final List<int> imageData = await asset.readAsBytes();
           final tempDir = await getTemporaryDirectory();
           final filePath = '${tempDir.path}/${asset.name}';
 
@@ -620,9 +592,6 @@ class _AppUploadImageState extends State<AppUploadImage> {
               images.remove(imageFile);
               resultList.remove(asset);
             });
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Text(
-                    Translate.of(context).translate('select_small_images'))));
             if (!mounted) return;
             context.read<AddListingCubit>().removeAssets(asset);
 
