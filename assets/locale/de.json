@@ -307,7 +307,7 @@
   "icon_require": "Symbol ist erforderlich",
   "input_zipcode": "Postleitzahl",
   "upload_feature_image": "Bild hochladen",
-  "upload_feature_image_pdf": "Bild oder PDF hochladen,\nMehrfachauswahl möglich",
+  "upload_feature_image_pdf": "Bild oder PDF hochladen,\nMehrfachauswahl möglich\n(maximal 20MB)",
   "edit": "Bearbeiten",
   "add_new_listing": "Neuer Beitrag",
   "edit_listing": "Eintrag aktualisieren",
@@ -524,6 +524,7 @@
   "enableNotification": "Benachrichtigungen aktivieren",
   "welcomeForumTitle": "Willkommen bei der Gruppenfunktion!",
   "welcomeForum": "Hier können über das blaue Plusicon neue Gruppen von dir erstellt werden. Du kannst private und öffentliche Gruppen erstellen. Mitglieder können jederzeit bei öffentlichen Gruppen beitreten und bei privaten Gruppen eine Anfrage stellen. Viel Spaß!",
-  "views": "Aufrufe"
+  "views": "Aufrufe",
+  "group_name": "Gruppenname"
 }
 

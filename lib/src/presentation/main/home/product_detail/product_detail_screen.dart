@@ -1053,6 +1053,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               ),
               child: AppUserInfo(
                 user: userDetail,
+                showEmail: false,
                 onPressed: () async {
                   final loggedInUserId = await context
                       .read<ProductDetailCubit>()
@@ -1101,7 +1102,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           leading: IconButton(
             icon: Icon(
               Icons.arrow_back,
-              color: Theme.of(context).iconTheme.color,
+              color: Theme.of(context).primaryColor,
             ),
             onPressed: () {
               Navigator.of(context).pop();

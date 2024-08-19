@@ -40,6 +40,7 @@ class Preferences {
       "pushNotificationsPermission";
   static const String receiveNotification = "receiveNotification";
   static const bool hasOpenedForumsBefore = false;
+  static const String keyboardHeight = "0.0";
 
   Preferences._(this._box);
 

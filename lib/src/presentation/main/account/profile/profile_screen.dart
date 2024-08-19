@@ -125,6 +125,7 @@ class _ProfileLoadedState extends State<ProfileLoaded> {
                 ],
               ),
               child: AppUserInfo(
+                showEmail: false,
                 user: widget.user,
                 type: UserViewType.information,
                 showDirectionIcon: false,
@@ -330,13 +331,17 @@ class _ProfileLoadedState extends State<ProfileLoaded> {
                                                             .start,
                                                     children: <Widget>[
                                                       Row(
-                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
                                                         children: [
                                                           Text(
-                                                            userListingsList[index]
+                                                            userListingsList[
+                                                                        index]
                                                                     .category ??
                                                                 '',
-                                                            style: Theme.of(context)
+                                                            style: Theme.of(
+                                                                    context)
                                                                 .textTheme
                                                                 .bodySmall!
                                                                 .copyWith(
@@ -346,21 +351,21 @@ class _ProfileLoadedState extends State<ProfileLoaded> {
                                                                 ),
                                                           ),
                                                           if (userListingsList[
-                                                          index]
-                                                              .viewCount !=
+                                                                      index]
+                                                                  .viewCount !=
                                                               null)
-                                                          Text(
-                                                            '${Translate.of(context).translate('views')}: ${userListingsList[index].viewCount ?? 0}',
-                                                            style: Theme.of(
-                                                                context)
-                                                                .textTheme
-                                                                .bodySmall!
-                                                                .copyWith(
-                                                              fontWeight:
-                                                              FontWeight
-                                                                  .w100,
+                                                            Text(
+                                                              '${Translate.of(context).translate('views')}: ${userListingsList[index].viewCount ?? 0}',
+                                                              style: Theme.of(
+                                                                      context)
+                                                                  .textTheme
+                                                                  .bodySmall!
+                                                                  .copyWith(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w100,
+                                                                  ),
                                                             ),
-                                                          ),
                                                         ],
                                                       ),
                                                       const SizedBox(height: 8),

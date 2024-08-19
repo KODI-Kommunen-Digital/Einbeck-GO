@@ -6,7 +6,7 @@
             "name": "News",
             "noOfSubcategories": 8,
             "icon": "fas fa-newspaper",
-            "color": "#ff8a65",
+            "color": "#e60004",
             "categoryType" : "category"
         },
         {
@@ -14,7 +14,7 @@
             "name": "Gruppen",
             "noOfSubcategories": 8,
             "icon": "fas fa-user-group",
-            "color": "#5A5A5A",
+            "color": "#a39f94",
             "categoryType" : "category"
         },
         {
@@ -22,7 +22,23 @@
             "name": "Events",
             "noOfSubcategories": 0,
             "icon": "far fa-calendar-check",
-            "color": "#a569bd",
+            "color": "#0065a9",
+            "categoryType" : "category"
+        },
+        {
+            "id": 16,
+            "name": "Amtliche Mitteilungen",
+            "noOfSubcategories": 0,
+            "icon": "fas fa-newspaper",
+            "color": "#5dadd8",
+            "categoryType" : "category"
+        },
+        {
+            "id": 4,
+            "name": "Vereine",
+            "noOfSubcategories": 0,
+            "icon": "far fa-handshake",
+            "color": "#ffd518",
             "categoryType" : "category"
         },
         {
@@ -30,7 +46,7 @@
             "name": "Essen/Trinken",
             "noOfSubcategories": 0,
             "icon": "fas fa-utensils",
-            "color": "#027148",
+            "color": "#50af47",
             "categoryType" : "category"
         },
         {
@@ -38,7 +54,7 @@
             "name": "Rathaus",
             "noOfSubcategories": 0,
             "icon": "fas fa-building",
-            "color": "#58A4B0",
+            "color": "#c7d530",
             "categoryType" : "category"
         },
         {
@@ -46,7 +62,7 @@
             "name": "Mitmachen",
             "noOfSubcategories": 0,
             "icon": "fas fa-ticket-simple",
-            "color": "#FFCA3A",
+            "color": "#c7d530",
             "categoryType" : "category"
         },
         {
@@ -54,7 +70,7 @@
             "name": "Freizeit",
             "noOfSubcategories": 0,
             "icon": "fas fa-umbrella-beach",
-            "color": "#C19AB7",
+            "color": "#ffffff",
             "categoryType" : "category"
         },
         {
@@ -62,15 +78,7 @@
             "name": "Suche/Biete",
             "noOfSubcategories": 0,
             "icon": "fas fa-magnifying-glass",
-            "color": "#58d68d",
-            "categoryType" : "category"
-        },
-        {
-            "id": 16,
-            "name": "Abfall",
-            "noOfSubcategories": 0,
-            "icon": "fas fa-trash",
-            "color": "#81C14B",
+            "color": "#66645c",
             "categoryType" : "category"
         }
     ]

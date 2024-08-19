@@ -3,8 +3,10 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  fast_rsa
   file_selector_windows
   firebase_core
+  flutter_secure_storage_windows
   permission_handler_windows
   sentry_flutter
   sqlite3_flutter_libs

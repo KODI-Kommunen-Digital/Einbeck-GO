@@ -96,6 +96,12 @@ dependencies:
   table_calendar: ^3.0.9
   flutter_typeahead: ^4.0.0
   shared_preferences: ^2.2.3
+  pointycastle: ^3.3.0
+  rsa_encrypt: ^2.0.0
+  encrypt: ^5.0.0
+  web_socket_channel: ^2.1.0
+  flutter_secure_storage: ^9.2.2
+  fast_rsa: ^3.6.3
 
 dev_dependencies:
   flutter_test:

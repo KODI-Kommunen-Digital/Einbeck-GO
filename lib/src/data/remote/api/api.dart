@@ -68,8 +68,7 @@ class Api {
   }
 
   static Future<ResultApiModel> requestMyListings(pageNo) async {
-    final result = await HTTPManager(forum: false)
-        .get(url: 'users/myListings');
+    final result = await HTTPManager(forum: false).get(url: 'users/myListings');
     return ResultApiModel.fromJson(result);
   }
 
@@ -99,9 +98,11 @@ class Api {
     return ResultApiModel.fromJson(result);
   }
 
-  static Future<ResultApiModel> requestToJoinGroup(forumId, cityId) async {
+  static Future<ResultApiModel> requestToJoinGroup(
+      forumId, cityId, params) async {
     final filepath = "cities/$cityId/forums/$forumId/memberRequests";
-    final result = await HTTPManager(forum: true).post(url: filepath);
+    final result =
+        await HTTPManager(forum: true).post(url: filepath, data: params);
     return ResultApiModel.fromJson(result);
   }
 
@@ -493,7 +494,8 @@ class Api {
       if (cityId != 0 && cityId != null) {
         var list =
             '/listings?categoryId=$params&statusId=1&pageNo=$pageNo&pageSize=19&sortByStartDate=true&cityId=$cityId&showExternalListings=$showExternalListings';
-        final result = await HTTPManager(forum: false).get(url: list, loading: true);
+        final result =
+            await HTTPManager(forum: false).get(url: list, loading: true);
         return ResultApiModel.fromJson(result);
       } else {
         var list =
@@ -646,6 +648,53 @@ class Api {
     var list =
         '/listings/search?searchQuery=$content$filter&pageNo=$pageNo&pageSize=10';
     final result = await HTTPManager(forum: false).get(url: list);
+    return ResultApiModel.fromJson(result);
+  }
+
+  static Future<ResultApiModel> getForumKeys(
+      {required int forumId,
+      required int userId,
+      required int cityId,
+      required Map<String, dynamic> params}) async {
+    final String filepath =
+        "/cities/$cityId/forums/$forumId/members/get-forum-keys";
+    final result =
+        await HTTPManager(forum: true).post(url: filepath, data: params);
+    return ResultApiModel.fromJson(result);
+  }
+
+  static Future<ResultApiModel> updateForumKeys(
+      {required Map<String, dynamic> params}) async {
+    const String filepath = "/users/update-key";
+    final result = await HTTPManager(forum: true).post(
+      url: filepath,
+      data: params,
+    );
+    return ResultApiModel.fromJson(result);
+  }
+
+  static Future<ResultApiModel> getForumChatMessages(
+      {required int forumId,
+      required int cityId,
+      required int? lastMessageId,
+      required int offset}) async {
+    final String filepath =
+        "/cities/$cityId/forums/$forumId/chat?offset=$offset";
+    final result = await HTTPManager(forum: true).get(
+      url: filepath,
+    );
+    return ResultApiModel.fromJson(result);
+  }
+
+  static Future<ResultApiModel> sendChatMessage(
+      {required int forumId,
+      required int cityId,
+      required String params}) async {
+    final String filepath = "/cities/$cityId/forums/$forumId/chat";
+    final result = await HTTPManager(forum: true).post(
+      url: filepath,
+      data: params,
+    );
     return ResultApiModel.fromJson(result);
   }
 

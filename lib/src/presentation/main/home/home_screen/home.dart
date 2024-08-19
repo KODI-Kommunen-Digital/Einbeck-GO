@@ -148,22 +148,6 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  Future<void> _setSavedCity(List<CategoryModel> location) async {
-    final savedCity = await AppBloc.homeCubit.checkSavedCity(location);
-    if (savedCity != null) {
-      setState(() {
-        selectedCityId = savedCity.id;
-        selectedCityTitle = savedCity.title;
-      });
-    } else {
-      await AppBloc.homeCubit.saveCityId(0);
-      setState(() {
-        selectedCityId = 0;
-      });
-    }
-    //AppBloc.homeCubit.onLoad(true);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -175,7 +159,11 @@ class _HomeScreenState extends State<HomeScreen> {
               onPressed: () {
                 _searchListings();
               },
-              icon: const Icon(Icons.search))
+              icon: Icon(
+                Icons.search,
+                color: Theme.of(context).textTheme.bodyLarge?.color ??
+                    Colors.white,
+              ))
         ],
       ),
       extendBodyBehindAppBar: true,
@@ -200,16 +188,20 @@ class _HomeScreenState extends State<HomeScreen> {
             isRefreshLoader = true;
             categoryLoading = false;
 
+            if (state.selectedCity != null) {
+              selectedCityTitle = state.selectedCity!.title;
+              selectedCityId = state.selectedCity!.id;
+            } else {
+              selectedCityTitle = Translate.of(context).translate('select_location');
+              selectedCityId = 0;
+            }
+
             if (location != null) {
               for (final ids in location!) {
                 cityTitles.add(ids.title.toString());
               }
               if (checkSavedCity) {
                 checkSavedCity = false;
-                _setSavedCity(location!);
-              } else if (AppBloc.homeCubit.getCalledExternally()) {
-                _setSavedCity(location!);
-                AppBloc.homeCubit.setCalledExternally(false);
               }
             }
             if (AppBloc.homeCubit.getDoesScroll()) {
@@ -224,10 +216,6 @@ class _HomeScreenState extends State<HomeScreen> {
             if (location!.isNotEmpty) {
               for (final ids in location!) {
                 cityTitles.add(ids.title.toString());
-              }
-              if (checkSavedCity) {
-                checkSavedCity = false;
-                _setSavedCity(location!);
               }
             }
           }
@@ -296,11 +284,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                   .translate('select_location')) {
                             setState(() {
                               selectedCityId = 0;
+                              selectedCityTitle = Translate.of(context)
+                                  .translate('select_location');
                             });
-                            _onUpdateCategory();
-                            AppBloc.homeCubit.saveCityId(selectedCityId);
+                            await AppBloc.homeCubit.saveCityId(selectedCityId);
                             await AppBloc.discoveryCubit
                                 .onLocationFilter(selectedCityId, false);
+
+                            _onUpdateCategory();
                             break;
                           }
                         }
@@ -517,10 +508,6 @@ class _HomeScreenState extends State<HomeScreen> {
       } else if (item.id == 15) {
         await Navigator.pushNamed(context, Routes.discoveryDetail, arguments: {
           'id': 15,
-        });
-      } else if (item.id == 16) {
-        await Navigator.pushNamed(context, Routes.discoveryDetail, arguments: {
-          'id': 16,
         });
       } else if (item.id == 18) {
         await launchUrl(
@@ -743,12 +730,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     .titleMedium!
                     .copyWith(fontWeight: FontWeight.bold),
               ),
-              Text(
-                Translate.of(context).translate(
-                  'let_find_interesting',
-                ),
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
             ],
           ),
         ),
@@ -831,12 +812,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     .textTheme
                     .titleMedium!
                     .copyWith(fontWeight: FontWeight.bold),
-              ),
-              Text(
-                Translate.of(context).translate(
-                  'what_happen',
-                ),
-                style: Theme.of(context).textTheme.bodyMedium,
               ),
             ],
           ),

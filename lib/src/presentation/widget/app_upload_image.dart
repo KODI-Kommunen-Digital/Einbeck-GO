@@ -6,7 +6,6 @@ import 'package:device_info/device_info.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_cached_pdfview/flutter_cached_pdfview.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
@@ -577,7 +576,7 @@ class _AppUploadImageState extends State<AppUploadImage> {
         for (XFile asset in resultListCopy) {
           //final ByteData byteData = await asset.getByteData();
           //final List<int> imageData = byteData.buffer.asUint8List();
-          final Uint8List imageData = await asset.readAsBytes();
+          final List<int> imageData = await asset.readAsBytes();
           final tempDir = await getTemporaryDirectory();
           final filePath = '${tempDir.path}/${asset.name}';
 

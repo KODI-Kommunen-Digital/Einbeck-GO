@@ -19,6 +19,7 @@ class HomeCubit extends Cubit<HomeState> {
   dynamic recent;
   dynamic sliders;
   dynamic categoryCount;
+  dynamic selectedCity;
   bool calledExternally = false;
   bool doesScroll = false;
 
@@ -45,9 +46,9 @@ class HomeCubit extends Cubit<HomeState> {
     category = List.from(categoryRequestResponse.data ?? []).map((item) {
       return CategoryModel.fromJson(item);
     }).toList();
-    CategoryModel? savedCity = await checkSavedCity(location);
-    if (savedCity != null) {
-      final listingsRequestResponse = await Api.requestLocList(savedCity.id, 1);
+    selectedCity = await checkSavedCity(location);
+    if (selectedCity != null) {
+      final listingsRequestResponse = await Api.requestLocList(selectedCity.id, 1);
       recent = List.from(listingsRequestResponse.data ?? []).map((item) {
         return ProductModel.fromJson(item);
       }).toList();
@@ -58,7 +59,7 @@ class HomeCubit extends Cubit<HomeState> {
       }).toList();
     }
     final categoryCountRequestResponse =
-        await Api.requestCategoryCount(savedCity?.id);
+        await Api.requestCategoryCount(selectedCity?.id);
     categoryCount =
         List.from(categoryCountRequestResponse.data ?? []).map((item) {
       return CategoryModel.fromJson(item);
@@ -67,7 +68,7 @@ class HomeCubit extends Cubit<HomeState> {
     const banner = Images.slider;
 
     List<CategoryModel> formattedCategories =
-        await formatCategoriesList(category, categoryCount, savedCity?.id);
+        await formatCategoriesList(category, categoryCount, selectedCity?.id);
 
     emit(HomeStateLoaded(
       banner,
@@ -75,6 +76,7 @@ class HomeCubit extends Cubit<HomeState> {
       location,
       recent,
       isRefreshLoader,
+      selectedCity
     ));
   }
 
@@ -129,15 +131,8 @@ class HomeCubit extends Cubit<HomeState> {
       location,
       recent,
       false,
+      selectedCity
     ));
-  }
-
-  bool getCalledExternally() {
-    return calledExternally;
-  }
-
-  void setCalledExternally(bool called) {
-    calledExternally = called;
   }
 
   bool getDoesScroll() {
@@ -182,6 +177,16 @@ class HomeCubit extends Cubit<HomeState> {
     //     element.hide = false;
     //   }
     // }
+    for (var category in categories) {
+      if (category.id != 1 &&
+          category.id != 17 &&
+          category.id != 6 &&
+          category.id != 4) {
+        category.hide = true;
+      } else {
+        category.hide = false;
+      }
+    }
 
     return categories;
   }

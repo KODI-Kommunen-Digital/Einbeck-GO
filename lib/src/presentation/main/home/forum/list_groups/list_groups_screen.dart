@@ -145,7 +145,6 @@ class _ListGroupScreenState extends State<ListGroupScreen> {
                   onPressed: _onAddGroup,
                   icon: const Icon(
                     Icons.add,
-                    color: Colors.white,
                   ),
                 ),
               ),
@@ -292,7 +291,7 @@ class _ListLoadedState extends State<ListLoaded> {
           userId: widget.userId,
           onPressed: (value) async {
             if (value) {
-              Navigator.pushNamed(context, Routes.groupDetails, arguments: item)
+              Navigator.pushNamed(context, Routes.groupChat, arguments: {'group': item})
                   .then((value) async {
                 await context.read<ListGroupsCubit>().onLoad();
                 //setState(() {});

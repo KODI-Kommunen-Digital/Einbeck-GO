@@ -1,7 +1,10 @@
-import 'dart:io';
+// ignore_for_file: unused_local_variable
 
+import 'dart:convert';
+import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:heidi/src/data/model/model.dart';
+import 'package:heidi/src/data/model/model_chat_message.dart';
 import 'package:heidi/src/data/model/model_comment.dart';
 import 'package:heidi/src/data/model/model_forum_group.dart';
 import 'package:heidi/src/data/model/model_forum_status.dart';
@@ -9,14 +12,17 @@ import 'package:heidi/src/data/model/model_product.dart';
 import 'package:heidi/src/data/model/model_request_member.dart';
 import 'package:heidi/src/data/remote/api/api.dart';
 import 'package:heidi/src/utils/configs/application.dart';
+import 'package:heidi/src/utils/configs/key_helper.dart';
 import 'package:heidi/src/utils/configs/preferences.dart';
 import 'package:heidi/src/utils/logger.dart';
 import 'package:heidi/src/utils/logging/loggy_exp.dart';
 import 'package:http_parser/http_parser.dart';
+import 'dart:async';
+import 'package:encrypt/encrypt.dart' as encrypt;
+import 'package:pointycastle/pointycastle.dart';
 
 class ForumRepository {
   final Preferences prefs;
-
   ForumRepository(this.prefs);
 
   Future<List?> loadForumsList({required pageNo}) async {
@@ -109,7 +115,29 @@ class ForumRepository {
 
   Future<ResultApiModel?> requestToJoinGroup(forumId) async {
     final cityId = prefs.getKeyValue(Preferences.cityId, 0);
-    final response = await Api.requestToJoinGroup(forumId, cityId);
+    final userId = await getLoggedInUserId();
+
+    bool keyExists = await KeyHelper.checkIfKeyExists(userId.toString());
+    if (!keyExists) {
+      try {
+        await KeyHelper.generateAndStoreRSAKeyPair(userId.toString());
+      } catch (e) {
+        logError('Failed to generate RSA key pair', e.toString());
+        return null;
+      }
+    }
+
+    String publicKey;
+    try {
+      publicKey = await KeyHelper.getPublicKey(userId.toString());
+    } catch (e) {
+      logError('Failed to retrieve public key', e.toString());
+      return null;
+    }
+
+    final response =
+        await Api.requestToJoinGroup(forumId, cityId, {'publicKey': publicKey});
+
     if (response.success) {
       return response;
     } else {
@@ -118,19 +146,209 @@ class ForumRepository {
     }
   }
 
-  Future<ResultApiModel?> requestGroupDetails(forumId, cityId) async {
+  bool isPrivate = false;
+
+  Future<ResultApiModel?> requestGroupDetails(int forumId, int cityId) async {
     int prefCityId = prefs.getKeyValue(Preferences.cityId, 0);
-    // if (cityId == 0) {
-    //   cityId = 1;
-    // }
+    final userId = prefs.getKeyValue(Preferences.userId, 0);
+
+    // Check if public key exists for the user
+    bool keyExists = await KeyHelper.checkIfKeyExists(userId.toString());
+    if (!keyExists) {
+      try {
+        await KeyHelper.generateAndStoreRSAKeyPair(userId.toString());
+        String? publicKey;
+        try {
+          publicKey = await KeyHelper.getPublicKey(userId.toString());
+          Map<String, String> params = {'publicKey': publicKey};
+          ResultApiModel keyUpdateResponse =
+              await Api.updateForumKeys(params: params);
+          // Handle the keyUpdateResponse if needed
+          if (!keyUpdateResponse.success) {
+            logError('Failed to update forum keys', keyUpdateResponse.message);
+          }
+        } catch (e) {
+          logError('Failed to retrieve public key', e.toString());
+        }
+      } catch (e) {
+        logError('Failed to generate RSA key pair', e.toString());
+      }
+    }
+
+    // Fetch group details
     final response = await Api.requestGroupDetails(
-        forumId, cityId != 0 ? cityId : prefCityId);
+      forumId,
+      cityId != 0 ? cityId : prefCityId,
+    );
+
     if (response.success) {
+      // Set the isPrivate flag based on the response
+      isPrivate = response.data['isPrivate'] == 1;
+
+      // If the forum is private, fetch and save forum keys
+      if (isPrivate) {
+        try {
+          await fetchUserGroupKeys(forumId);
+        } catch (e) {
+          logError('Failed to fetch and save forum keys', e.toString());
+        }
+      }
+
+      // Fetch initial chat messages
+      try {
+        final chatMessagesResponse = await requestChatMessages(forumId, 0, 20);
+        if (chatMessagesResponse != null && chatMessagesResponse.success) {
+          response.data['chatMessages'] = chatMessagesResponse.data;
+        } else {
+          logError('Failed to fetch chat messages',
+              chatMessagesResponse?.message ?? 'Unknown error');
+        }
+      } catch (e) {
+        logError('Exception while fetching chat messages', e.toString());
+      }
+
       return response;
     } else {
       logError('Request Group Detail Response Failed', response.message);
       return null;
     }
+  }
+
+  Future<ResultApiModel?> requestChatMessages(
+      forumId, lastMessageId, offset) async {
+    int prefCityId = prefs.getKeyValue(Preferences.cityId, 0);
+    final userId = prefs.getKeyValue(Preferences.userId, 0);
+
+    // Fetch chat messages
+    final response = await Api.getForumChatMessages(
+        forumId: forumId,
+        cityId: prefCityId,
+        lastMessageId: lastMessageId,
+        offset: offset);
+
+    if (response.success) {
+      if (isPrivate) {
+        return await decryptPrivateMessages(response, forumId, userId);
+      } else {
+        return response;
+      }
+    } else {
+      logError('Request Chat Messages Failed', response.message);
+      return null;
+    }
+  }
+
+  Future<ResultApiModel?> decryptPrivateMessages(
+      ResultApiModel response, int forumId, int userId) async {
+    final List<ChatMessageModel> messages = [];
+    final storedForumKeyVersion =
+        await KeyHelper.getStoredForumKeyVersion(forumId.toString());
+
+    if (storedForumKeyVersion == null) {
+      await fetchUserGroupKeys(forumId);
+    }
+
+    for (var messageData in response.data) {
+      final encryptedMessage = messageData['message'];
+      final groupKeyVersion = messageData['groupKeyVersion'];
+      String? groupKeyData = await KeyHelper.getForumKey(
+        forumId: forumId.toString(),
+        groupKeyVersion: groupKeyVersion,
+      );
+
+      if (groupKeyData == null) {
+        await fetchUserGroupKeys(forumId, version: [groupKeyVersion]);
+        groupKeyData = await KeyHelper.getForumKey(
+          forumId: forumId.toString(),
+          groupKeyVersion: groupKeyVersion,
+        );
+        if (groupKeyData == null) continue;
+      }
+
+      final decrypted = await decryptData(encryptedMessage, groupKeyData);
+      final actualMessageJson = jsonDecode(decrypted);
+      final actualMessage = actualMessageJson['message'];
+
+      messages.add(ChatMessageModel(
+        id: messageData['id'],
+        forumId: messageData['forumId'],
+        userId: messageData['userId'],
+        decryptedMessage: actualMessage,
+        createdAt: messageData['createdAt'],
+      ));
+    }
+
+    return ResultApiModel(
+        success: true,
+        data: messages,
+        pagination: response.pagination,
+        message: response.message);
+  }
+
+  Future<void> fetchUserGroupKeys(int forumId, {List<int>? version}) async {
+    final int userId = prefs.getKeyValue(Preferences.userId, 0);
+    final int cityId = prefs.getKeyValue(Preferences.cityId, 0);
+
+    try {
+      final ResultApiModel response = await Api.getForumKeys(
+        forumId: forumId,
+        userId: userId,
+        cityId: cityId,
+        params: {'groupKeyversions': version},
+      );
+
+      if (response.success) {
+        List<dynamic> groupKeyData = response.data;
+        for (var element in groupKeyData) {
+          String decryptedGroupKeyData = await decryptGroupKey(
+            userId,
+            element["encryptedForumAesKey"],
+          );
+          int groupKeyVersion = element['groupKeyVersion'] as int;
+
+          await KeyHelper.storeForumKey(
+            forumId: forumId.toString(),
+            groupKeyVersion: groupKeyVersion.toString(),
+            encryptedForumAesKey: decryptedGroupKeyData,
+          );
+        }
+      } else {
+        throw Exception('Failed to fetch group keys: ${response.message}');
+      }
+    } catch (e) {
+      logError('Error fetching group keys', e.toString());
+      throw Exception('Failed to fetch group keys');
+    }
+  }
+
+  Future<String> decryptGroupKey(int userId, String encryptedValue) async {
+    final privateKeyPem = await KeyHelper.getPrivateKey(userId.toString());
+    final parser = encrypt.RSAKeyParser();
+    final privateKey = parser.parse(privateKeyPem) as RSAPrivateKey;
+
+    final encrypter = encrypt.Encrypter(encrypt.RSA(
+        privateKey: privateKey, encoding: encrypt.RSAEncoding.OAEP));
+
+    final encrypted = encrypt.Encrypted(base64Decode(encryptedValue));
+    final decrypted = encrypter.decrypt(encrypted);
+    return decrypted;
+  }
+
+  Future<String> decryptData(String encryptedData, String keyString) async {
+    final parts = encryptedData.split(':');
+    final ivBytes = base64Decode(parts[0]);
+    final data = base64Decode(parts[1]);
+    final iv = encrypt.IV(ivBytes);
+    final key = base64Decode(keyString);
+
+    final encrypter = encrypt.Encrypter(
+        encrypt.AES(encrypt.Key(key), mode: encrypt.AESMode.cbc));
+    final decrypted = encrypter.decrypt(
+      encrypt.Encrypted(data),
+      iv: iv,
+    );
+
+    return decrypted;
   }
 
   Future<bool> removeUserFromGroup(forumId, memberId) async {
@@ -326,7 +544,7 @@ class ForumRepository {
     await Api.deleteImage(cityId, listingId);
   }
 
-  static Future<ProductModel?> loadProduct(cityId, id) async {
+  Future<ProductModel?> loadProduct(cityId, id) async {
     final response = await Api.requestProduct(cityId, id);
     if (response.success) {
       UtilLogger.log('ErrorReason', response.data);
@@ -358,6 +576,7 @@ class ForumRepository {
   ) async {
     final cityId = await getCityId(city);
     int cityIdPref = prefs.getKeyValue(Preferences.cityId, 0);
+    final userId = prefs.getKeyValue(Preferences.userId, 0);
     final image = prefs.getKeyValue(Preferences.path, null);
     bool isPrivate = false;
     if (type == 'public') {
@@ -384,6 +603,23 @@ class ForumRepository {
         await Api.requestForumImageUpload(cityId, forumId, pickedFile);
       }
       prefs.deleteKey('pickedFile');
+      bool keyExists = await KeyHelper.checkIfKeyExists(userId.toString());
+      if (!keyExists) {
+        try {
+          await KeyHelper.generateAndStoreRSAKeyPair(userId.toString());
+          String? publicKey;
+          try {
+            publicKey = await KeyHelper.getPublicKey(userId.toString());
+            Map<String, String> params = {'publicKey': publicKey};
+            ResultApiModel keyUpdateResponse =
+                await Api.updateForumKeys(params: params);
+          } catch (e) {
+            logError('Failed to retrieve public key', e.toString());
+          }
+        } catch (e) {
+          logError('Failed to generate RSA key pair', e.toString());
+        }
+      }
     }
     return response;
   }
