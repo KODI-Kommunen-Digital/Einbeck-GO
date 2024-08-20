@@ -17,11 +17,20 @@ class FirebaseApi {
 
   Future<void> handleMessageOnUserInteraction(RemoteMessage? message) async {
     if (message != null) {
-      final item = await ListRepository.loadProduct(
-          int.parse(message.data["cityId"]), int.parse(message.data["id"]));
-      if (item != null) {
-        navigatorKey.currentState
-            ?.pushNamed(Routes.productDetail, arguments: item);
+      if (message.from != null && message.from!.contains("groupChat")) {
+        final int cityId = int.parse(message.data["cityId"]);
+
+        navigatorKey.currentState?.pushNamed(
+          Routes.listGroups,
+          arguments: {'id': cityId, 'title': 'Gruppen'},
+        );
+      } else {
+        final item = await ListRepository.loadProduct(
+            int.parse(message.data["cityId"]), int.parse(message.data["id"]));
+        if (item != null) {
+          navigatorKey.currentState
+              ?.pushNamed(Routes.productDetail, arguments: item);
+        }
       }
     }
   }

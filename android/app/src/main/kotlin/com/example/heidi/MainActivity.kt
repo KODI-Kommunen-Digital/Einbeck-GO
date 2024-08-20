@@ -1,4 +1,4 @@
-package com.einbeck
+package com.einbeck.einbeckgo
 
 import io.flutter.embedding.android.FlutterActivity
 

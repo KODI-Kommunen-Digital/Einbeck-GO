@@ -162,8 +162,8 @@ class GroupDetailsCubit extends Cubit<GroupDetailsState> {
     }
   }
 
-  Future<void> receivePublicMessages(BuildContext context, int forumId,
-      int? cityId, bool isInitialLoad) async {
+  Future<List<ChatMessageModel>> receivePublicMessages(BuildContext context,
+      int forumId, int? cityId, bool isInitialLoad) async {
     final prefs = await Preferences.openBox();
     int cityId = prefs.getKeyValue(Preferences.cityId, 0);
     final requestGroupMembersResponse =
@@ -205,9 +205,11 @@ class GroupDetailsCubit extends Cubit<GroupDetailsState> {
       offset: 1,
     );
 
+    List<ChatMessageModel> newMessages = [];
+
     if (response.data != null) {
-      final newMessages =
-          await _processMessages(response.data, forumId, userMap);
+      newMessages = await _processMessages(response.data, forumId, userMap);
+
       final currentState = state;
 
       List<ChatMessageModel> updatedMessages = [];
@@ -238,6 +240,7 @@ class GroupDetailsCubit extends Cubit<GroupDetailsState> {
       }
     }
     _currentOffset = 2;
+    return newMessages;
   }
 
   Future<List<ChatMessageModel>> _processMessages(List<dynamic> messageData,

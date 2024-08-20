@@ -525,6 +525,7 @@
   "welcomeForumTitle": "Willkommen bei der Gruppenfunktion!",
   "welcomeForum": "Hier können über das blaue Plusicon neue Gruppen von dir erstellt werden. Du kannst private und öffentliche Gruppen erstellen. Mitglieder können jederzeit bei öffentlichen Gruppen beitreten und bei privaten Gruppen eine Anfrage stellen. Viel Spaß!",
   "views": "Aufrufe",
-  "group_name": "Gruppenname"
+  "group_name": "Gruppenname",
+  "new_message": "Neue Nachricht"
 }
 

@@ -30,20 +30,22 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<GroupDetailsCubit, GroupDetailsState>(
-        builder: (context, state) => state.maybeWhen(
-            loading: () => const ChatLoading(),
-            loaded: (list, group, isAdmin, userId) => ChatLoaded(
-                  group: group,
-                  isAdmin: isAdmin,
-                  userId: userId,
-                ),
-            messagesLoaded: (messages, group, isAdmin, userId) => ChatLoaded(
-                  group: group,
-                  isAdmin: isAdmin,
-                  userId: userId,
-                  messages: messages,
-                ),
-            orElse: () => ErrorWidget("Failed to load chat.")));
+      builder: (context, state) => state.maybeWhen(
+        loading: () => const ChatLoading(),
+        loaded: (list, group, isAdmin, userId) => ChatLoaded(
+          group: group,
+          isAdmin: isAdmin,
+          userId: userId,
+        ),
+        messagesLoaded: (messages, group, isAdmin, userId) => ChatLoaded(
+          group: group,
+          isAdmin: isAdmin,
+          userId: userId,
+          messages: messages,
+        ),
+        orElse: () => ErrorWidget("Failed to load chat."),
+      ),
+    );
   }
 }
 
@@ -66,12 +68,13 @@ class ChatLoaded extends StatefulWidget {
   final ForumGroupModel group;
   final List<ChatMessageModel>? messages;
 
-  const ChatLoaded(
-      {super.key,
-      required this.isAdmin,
-      required this.userId,
-      required this.group,
-      this.messages});
+  const ChatLoaded({
+    super.key,
+    required this.isAdmin,
+    required this.userId,
+    required this.group,
+    this.messages,
+  });
 
   @override
   State<ChatLoaded> createState() => _ChatLoadedState();
@@ -80,11 +83,12 @@ class ChatLoaded extends StatefulWidget {
 class _ChatLoadedState extends State<ChatLoaded> {
   WebSocketChannel? channel;
   Timer? pingTimer;
-  String _websocketPings = "";
   final ScrollController _scrollController = ScrollController();
   final FocusNode _inputFocusNode = FocusNode();
-
+  int _unreadMessageCount = 0;
+  bool _showNewMessageBanner = false;
   bool isLoading = false;
+  Timer? _bannerTimer;
 
   @override
   void initState() {
@@ -100,6 +104,9 @@ class _ChatLoadedState extends State<ChatLoaded> {
     if (pingTimer != null) {
       pingTimer?.cancel();
     }
+    if (_bannerTimer != null) {
+      _bannerTimer?.cancel();
+    }
     _scrollController.dispose();
     _inputFocusNode.dispose();
     context.read<GroupDetailsCubit>().resetOffset();
@@ -112,7 +119,6 @@ class _ChatLoadedState extends State<ChatLoaded> {
     await channel?.ready;
     final prefs = await Preferences.openBox();
     int cityId = prefs.getKeyValue(Preferences.cityId, 0);
-    // Sending channel subscription message
     channel?.sink.add(jsonEncode({
       "type": "subscribe",
       "channelId": "city_${cityId}_forum_$forumId",
@@ -120,11 +126,18 @@ class _ChatLoadedState extends State<ChatLoaded> {
 
     channel?.stream.listen((event) {
       final decodedEvent = jsonDecode(event);
-      if (decodedEvent['type'] == "newMessage") {
+
+      if (decodedEvent['type'] == "newMessage" &&
+          decodedEvent['senderId'] != widget.userId) {
+        setState(() {
+          _unreadMessageCount += 1;
+          _showNewMessageBanner = true;
+        });
+        _startBannerTimer();
         _fetchMessages(isInitialLoad: false);
-        final currDate = DateTime.now().toLocal().toString();
-        _websocketPings = "$event\t$currDate\n$_websocketPings";
-        setState(() {});
+      } else {
+        // Fetch the message without showing the banner
+        _fetchMessages(isInitialLoad: false);
       }
     }).onDone(() {
       if (kDebugMode) {
@@ -138,162 +151,220 @@ class _ChatLoadedState extends State<ChatLoaded> {
     });
   }
 
+  void _startBannerTimer() {
+    _bannerTimer?.cancel();
+    _bannerTimer = Timer(const Duration(seconds: 3), () {
+      if (mounted) {
+        setState(() {
+          _showNewMessageBanner = false;
+        });
+      }
+    });
+  }
+
   Future<void> _fetchMessages({required bool isInitialLoad}) async {
     if (isInitialLoad) {
       context.read<GroupDetailsCubit>().receivePublicMessages(
-          context,
-          widget.group.id ?? 1,
-          widget.group.cityId == 0 ? 1 : widget.group.cityId,
-          isInitialLoad);
+            context,
+            widget.group.id ?? 1,
+            widget.group.cityId == 0 ? 1 : widget.group.cityId,
+            isInitialLoad,
+          );
       _scrollToBottom();
     } else {
       context.read<GroupDetailsCubit>().receivePublicMessages(
-          context,
-          widget.group.id ?? 1,
-          widget.group.cityId == 0 ? 1 : widget.group.cityId,
-          isInitialLoad);
+            context,
+            widget.group.id ?? 1,
+            widget.group.cityId == 0 ? 1 : widget.group.cityId,
+            isInitialLoad,
+          );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<GroupDetailsCubit, GroupDetailsState>(
-        builder: (context, state) {
-      return Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-          title: Row(
-            children: [
-              const SizedBox(width: 8),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      widget.group.forumName ?? 'Group',
-                      style: const TextStyle(fontSize: 16),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+      builder: (context, state) {
+        return Scaffold(
+          appBar: AppBar(
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            title: Row(
+              children: [
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.group.forumName ?? 'Group',
+                        style: const TextStyle(fontSize: 16),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
-          actions: [
-            PopupMenuButton<String>(
-              icon: const Icon(
-                Icons.more_vert, // Three vertical dots icon
-              ),
-              onSelected: (String choice) {
-                if (choice == Translate.of(context).translate('leave_group')) {
-                  showLeaveGroupConfirmation(context);
-                } else if (choice ==
-                    Translate.of(context).translate('see_member')) {
-                  Navigator.pushNamed(
-                    context,
-                    Routes.groupMembersDetails,
-                    arguments: {
-                      'groupId': widget.group.id,
-                      'cityId': widget.group.cityId
-                    },
-                  );
-                } else if (choice ==
-                    Translate.of(context).translate('member_requests')) {
-                  Navigator.pushNamed(context, Routes.memberRequestDetails,
+              ],
+            ),
+            actions: [
+              PopupMenuButton<String>(
+                icon: const Icon(
+                  Icons.more_vert, // Three vertical dots icon
+                ),
+                onSelected: (String choice) {
+                  if (choice ==
+                      Translate.of(context).translate('leave_group')) {
+                    showLeaveGroupConfirmation(context);
+                  } else if (choice ==
+                      Translate.of(context).translate('see_member')) {
+                    Navigator.pushNamed(
+                      context,
+                      Routes.groupMembersDetails,
                       arguments: {
                         'groupId': widget.group.id,
                         'cityId': widget.group.cityId
-                      });
-                } else if (choice ==
-                    Translate.of(context).translate('delete_group')) {
-                  showDeleteGroupConfirmation(context);
-                } else if (choice ==
-                    Translate.of(context).translate('edit_group')) {
-                  Navigator.pushNamed(context, Routes.addGroups, arguments: {
-                    'isNewGroup': false,
-                    'forumDetails': widget.group
-                  }).then((value) async {
-                    await context
-                        .read<GroupDetailsCubit>()
-                        .onLoad(widget.group.id);
-                    setState(() {});
-                  });
-                }
-              },
-              itemBuilder: (BuildContext context) {
-                return widget.isAdmin
-                    ? widget.group.isPrivate == 1
-                        ? {
-                            Translate.of(context).translate('leave_group'),
-                            Translate.of(context).translate('see_member'),
-                            Translate.of(context).translate('edit_group'),
-                            Translate.of(context).translate('member_requests'),
-                            Translate.of(context).translate('delete_group'),
-                          }.map((String choice) {
-                            return PopupMenuItem<String>(
-                              value: choice,
-                              child: Text(choice),
-                            );
-                          }).toList()
-                        : {
-                            Translate.of(context).translate('leave_group'),
-                            Translate.of(context).translate('see_member'),
-                            Translate.of(context).translate('edit_group'),
-                            Translate.of(context).translate('delete_group'),
-                          }.map((String choice) {
-                            return PopupMenuItem<String>(
-                              value: choice,
-                              child: Text(choice),
-                            );
-                          }).toList()
-                    : {
-                        Translate.of(context).translate('leave_group'),
-                        Translate.of(context).translate('see_member'),
-                      }.map((String choice) {
-                        return PopupMenuItem<String>(
-                          value: choice,
-                          child: Text(choice),
-                        );
-                      }).toList();
-              },
-            ),
-          ],
-        ),
-        body: SafeArea(
-          child: Column(
-            children: [
-              Expanded(
-                child: ChatMessageList(
-                  scrollController: _scrollController,
-                  inputFocusNode: _inputFocusNode,
-                ),
-              ),
-              ChatInput(
-                onSend: (text) async {
-                  await context.read<GroupDetailsCubit>().sendMessage(
-                        context,
-                        widget.group.id ?? 1,
-                        text,
-                      );
-                  _scrollToBottom();
+                      },
+                    );
+                  } else if (choice ==
+                      Translate.of(context).translate('member_requests')) {
+                    Navigator.pushNamed(context, Routes.memberRequestDetails,
+                        arguments: {
+                          'groupId': widget.group.id,
+                          'cityId': widget.group.cityId
+                        });
+                  } else if (choice ==
+                      Translate.of(context).translate('delete_group')) {
+                    showDeleteGroupConfirmation(context);
+                  } else if (choice ==
+                      Translate.of(context).translate('edit_group')) {
+                    Navigator.pushNamed(context, Routes.addGroups, arguments: {
+                      'isNewGroup': false,
+                      'forumDetails': widget.group
+                    }).then((value) async {
+                      await context
+                          .read<GroupDetailsCubit>()
+                          .onLoad(widget.group.id);
+                      setState(() {});
+                    });
+                  }
                 },
-                focusNode: _inputFocusNode,
+                itemBuilder: (BuildContext context) {
+                  return widget.isAdmin
+                      ? widget.group.isPrivate == 1
+                          ? {
+                              Translate.of(context).translate('leave_group'),
+                              Translate.of(context).translate('see_member'),
+                              Translate.of(context).translate('edit_group'),
+                              Translate.of(context)
+                                  .translate('member_requests'),
+                              Translate.of(context).translate('delete_group'),
+                            }.map((String choice) {
+                              return PopupMenuItem<String>(
+                                value: choice,
+                                child: Text(choice),
+                              );
+                            }).toList()
+                          : {
+                              Translate.of(context).translate('leave_group'),
+                              Translate.of(context).translate('see_member'),
+                              Translate.of(context).translate('edit_group'),
+                              Translate.of(context).translate('delete_group'),
+                            }.map((String choice) {
+                              return PopupMenuItem<String>(
+                                value: choice,
+                                child: Text(choice),
+                              );
+                            }).toList()
+                      : {
+                          Translate.of(context).translate('leave_group'),
+                          Translate.of(context).translate('see_member'),
+                        }.map((String choice) {
+                          return PopupMenuItem<String>(
+                            value: choice,
+                            child: Text(choice),
+                          );
+                        }).toList();
+                },
               ),
             ],
           ),
-        ),
+          body: SafeArea(
+            child: Column(
+              children: [
+                if (_showNewMessageBanner)
+                  GestureDetector(
+                    onTap: () {
+                      _scrollToUnreadMessage();
+                      setState(() {
+                        _showNewMessageBanner = false;
+                        _unreadMessageCount = 0;
+                      });
+                    },
+                    child: Container(
+                      color: const Color(0xFFe30613),
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      width: double.infinity,
+                      child: Stack(
+                        children: [
+                          Center(
+                            child: Text(
+                              "${Translate.of(context).translate('new_message')} ($_unreadMessageCount)",
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                Expanded(
+                  child: ChatMessageList(
+                    scrollController: _scrollController,
+                    inputFocusNode: _inputFocusNode,
+                  ),
+                ),
+                ChatInput(
+                  onSend: (text) async {
+                    await context.read<GroupDetailsCubit>().sendMessage(
+                          context,
+                          widget.group.id ?? 1,
+                          text,
+                        );
+                    _scrollToBottom();
+                  },
+                  focusNode: _inputFocusNode,
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _scrollToUnreadMessage() {
+    if (_scrollController.hasClients && _unreadMessageCount > 0) {
+      final unreadMessageOffset =
+          _calculateOffsetForUnreadMessage(_unreadMessageCount);
+      _scrollController.animateTo(
+        unreadMessageOffset,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeOut,
       );
-    });
+    }
+  }
+
+  double _calculateOffsetForUnreadMessage(int messageCount) {
+    const double messageHeight = 70.0;
+    return messageHeight * messageCount;
   }
 
   void _scrollToBottom() {
     if (_scrollController.hasClients) {
       _scrollController.animateTo(
         _scrollController.position.minScrollExtent,
-        duration: const Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 600),
         curve: Curves.easeOut,
       );
     }
@@ -395,7 +466,7 @@ class _ChatLoadedState extends State<ChatLoaded> {
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
+                Navigator.of(context).pop();
               },
               child: const Text('OK'),
             ),

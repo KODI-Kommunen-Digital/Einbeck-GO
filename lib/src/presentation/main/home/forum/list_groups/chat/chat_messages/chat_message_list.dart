@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:heidi/src/utils/configs/application.dart';
 import 'package:intl/intl.dart';
 import 'package:heidi/src/presentation/main/home/forum/list_groups/group_details/cubit/group_details_cubit.dart';
 import 'package:heidi/src/presentation/main/home/forum/list_groups/group_details/cubit/group_details_state.dart';
-
-import '../../../../../../../utils/configs/application.dart';
 
 class ChatMessageList extends StatefulWidget {
   final ScrollController scrollController;

@@ -26,6 +26,8 @@
 	<string>1.0.0</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCalendarsUsageDescription</key>
+	<string>Wir brauchen Zugriff zu deinem Kalender, um Events hinzuzufügen</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Need camera access for uploading images</string>
 	<key>NSDownloadsFolderUsageDescription</key>
@@ -40,8 +42,6 @@
 	<string>Need microphone access for uploading audio</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Wir benötigen Zugang zur Bildergalerie, sodass du Bilder hochladen kannst.</string>
-	<key>NSCalendarsUsageDescription</key>
-	<string>Wir brauchen Zugriff zu deinem Kalender, um Events hinzuzufügen</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>

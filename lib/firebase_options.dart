@@ -50,20 +50,20 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDVYPcTzVQOcKjjJGHW_BOlW2nfLbLhT18',
-    appId: '1:660123882783:android:8259bab2e595c4fbb1cc2a',
-    messagingSenderId: '660123882783',
-    projectId: 'smart-region-1ce64',
-    storageBucket: 'smart-region-1ce64.appspot.com',
+    apiKey: 'AIzaSyCkb2tIKRwH9hpgBJUUivJHsn47Slr9cFc',
+    appId: '1:9601065227:android:720535cb9ffc8702e2820e',
+    messagingSenderId: '9601065227',
+    projectId: 'einbeck-8cc0c',
+    storageBucket: 'einbeck-8cc0c.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyAF7sEOfWwKCe5HXFkjBRF4utW0TxOsAzc',
-    appId: '1:660123882783:ios:2a1331f5b1e82fe6b1cc2a',
-    messagingSenderId: '660123882783',
-    projectId: 'smart-region-1ce64',
-    storageBucket: 'smart-region-1ce64.appspot.com',
-    iosClientId: '660123882783-3gi7uh3v72s0e46p3dmr5k1l3cs1tur5.apps.googleusercontent.com',
-    iosBundleId: 'com.einbeck',
+    apiKey: 'AIzaSyADtvUV3hAQyBn-OQMtdIBIZH0bczwvT08',
+    appId: '1:9601065227:ios:00b36a0e468405d5e2820e',
+    messagingSenderId: '9601065227',
+    projectId: 'einbeck-8cc0c',
+    storageBucket: 'einbeck-8cc0c.appspot.com',
+    iosBundleId: 'com.einbeck.einbeckgo',
   );
+
 }
