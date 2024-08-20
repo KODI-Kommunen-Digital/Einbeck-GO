@@ -73,6 +73,14 @@ class FirebaseApi {
     FirebaseMessaging.onBackgroundMessage(handleBackgroundMessage);
   }
 
+  Future<void> subscribeToTopic(String topic) async {
+    await _firebaseMessaging.subscribeToTopic(topic);
+  }
+
+  Future<void> unsubscribeFromTopic(String topic) async {
+    await _firebaseMessaging.unsubscribeFromTopic(topic);
+  }
+
   Future<void> refreshNotifications() async {
     final pushNotificationsPermission =
         await prefs.getKeyValue(Preferences.pushNotificationsPermission, "0");

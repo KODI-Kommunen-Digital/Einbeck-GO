@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_svprogresshud/flutter_svprogresshud.dart';
-import 'package:heidi/src/data/model/model.dart';
+import 'package:heidi/src/data/remote/api/api.dart';
 import 'package:heidi/src/presentation/cubit/app_bloc.dart';
 import 'package:heidi/src/utils/configs/application.dart';
 import 'package:heidi/src/utils/configs/preferences.dart';
@@ -61,9 +61,7 @@ class HTTPManager {
           final Map<String, dynamic> params = {
             "refreshToken": rToken,
           };
-          final result =
-              await post(url: '/users/$userId/refresh', data: params);
-          final response = ResultApiModel.fromJson(result);
+          final response = await Api.requestRefreshToken(userId, params);
           if (response.success) {
             final newToken = response.data['accessToken'];
             prefs.setKeyValue(Preferences.token, newToken);

@@ -678,8 +678,13 @@ class Api {
       required int cityId,
       required int? lastMessageId,
       required int offset}) async {
-    final String filepath =
-        "/cities/$cityId/forums/$forumId/chat?offset=$offset";
+    String filepath =
+        "/cities/$cityId/forums/$forumId/chat?pageNo=$offset&pageSize=15";
+
+    if (lastMessageId != null && lastMessageId > 0) {
+      filepath += "&lastMessageId=$lastMessageId";
+    }
+
     final result = await HTTPManager(forum: true).get(
       url: filepath,
     );

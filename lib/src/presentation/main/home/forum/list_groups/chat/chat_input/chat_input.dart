@@ -23,6 +23,14 @@ class _ChatInputState extends State<ChatInput> {
             child: TextField(
               controller: _controller,
               focusNode: widget.focusNode,
+              textInputAction: TextInputAction.newline,
+              onSubmitted: (value) {
+                if (_controller.text.isNotEmpty) {
+                  widget.onSend(_controller.text);
+                  _controller.clear();
+                  widget.focusNode.requestFocus();
+                }
+              },
               decoration: InputDecoration(
                 hintText: 'Type a message...',
                 border: OutlineInputBorder(

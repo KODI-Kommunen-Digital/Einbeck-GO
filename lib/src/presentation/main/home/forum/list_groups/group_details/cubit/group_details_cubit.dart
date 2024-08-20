@@ -162,10 +162,8 @@ class GroupDetailsCubit extends Cubit<GroupDetailsState> {
     }
   }
 
-  bool _isFirstTimeOpeningGroup = true;
-
-  Future<void> receivePublicMessages(
-      BuildContext context, int forumId, int? cityId) async {
+  Future<void> receivePublicMessages(BuildContext context, int forumId,
+      int? cityId, bool isInitialLoad) async {
     final prefs = await Preferences.openBox();
     int cityId = prefs.getKeyValue(Preferences.cityId, 0);
     final requestGroupMembersResponse =
@@ -191,31 +189,48 @@ class GroupDetailsCubit extends Cubit<GroupDetailsState> {
       for (var member in groupMembersList) member.userId: member
     };
 
+    int? lastMessageId;
+    if (!isInitialLoad) {
+      final currentState = state;
+      if (currentState is GroupDetailsStateMessagesLoaded &&
+          currentState.messages.isNotEmpty) {
+        lastMessageId = currentState.messages.first.id;
+      }
+    }
+
     final response = await Api.getForumChatMessages(
       forumId: forumId,
       cityId: cityId,
-      lastMessageId: _isFirstTimeOpeningGroup ? 0 : null,
+      lastMessageId: isInitialLoad ? 0 : lastMessageId,
       offset: 1,
     );
 
     if (response.data != null) {
-      final messages = await _processMessages(response.data, forumId, userMap);
-
-      final sortedMessages = messages;
-
+      final newMessages =
+          await _processMessages(response.data, forumId, userMap);
       final currentState = state;
+
+      List<ChatMessageModel> updatedMessages = [];
+
+      if (isInitialLoad) {
+        updatedMessages = newMessages;
+      } else if (currentState is GroupDetailsStateMessagesLoaded &&
+          !isInitialLoad) {
+        updatedMessages = List.from(newMessages)..addAll(currentState.messages);
+      }
+
       if (currentState is GroupDetailsStateLoaded) {
         emit(GroupDetailsState.messagesLoaded(
-          sortedMessages,
+          updatedMessages,
           currentState.arguments,
           currentState.isAdmin,
           currentState.userId,
         ));
       } else if (currentState is GroupDetailsStateMessagesLoaded) {
-        emit(currentState.copyWith(messages: sortedMessages));
+        emit(currentState.copyWith(messages: updatedMessages));
       } else {
         emit(GroupDetailsState.messagesLoaded(
-          sortedMessages,
+          updatedMessages,
           arguments,
           false,
           await UserRepository.getLoggedUserId(),
@@ -223,7 +238,6 @@ class GroupDetailsCubit extends Cubit<GroupDetailsState> {
       }
     }
     _currentOffset = 2;
-    _isFirstTimeOpeningGroup = false;
   }
 
   Future<List<ChatMessageModel>> _processMessages(List<dynamic> messageData,
@@ -283,10 +297,8 @@ class GroupDetailsCubit extends Cubit<GroupDetailsState> {
         throw Exception('Decryption failed');
       }
     } else {
-      // If failed to retrieve the specific group key, try fetching the latest group keys
       await fetchUserGroupKeys(forumId);
 
-      // Retrieve the latest group key version after fetching
       final latestGroupKeyVersion =
           await KeyHelper.getStoredForumKeyVersion(forumId.toString());
       if (latestGroupKeyVersion != null) {
@@ -329,8 +341,6 @@ class GroupDetailsCubit extends Cubit<GroupDetailsState> {
     } else {
       await sendPublicMessage(context, forumId, message, prefCityId);
     }
-
-    await receivePublicMessages(context, forumId, prefCityId);
   }
 
   Future<void> fetchOlderMessages(BuildContext context, int forumId) async {
@@ -344,17 +354,42 @@ class GroupDetailsCubit extends Cubit<GroupDetailsState> {
 
     List<ChatMessageModel> currentMessages = currentState.messages;
 
+    // Fetching group members to map users
+    final requestGroupMembersResponse =
+        await repo.getGroupMembers(forumId, cityId);
+    final groupMembersList = <GroupMembersModel>[];
+
+    if (requestGroupMembersResponse?.data != null) {
+      for (final member in requestGroupMembersResponse!.data) {
+        groupMembersList.add(GroupMembersModel(
+          userId: member['userId'],
+          username: member['username'],
+          memberId: member['memberId'],
+          firstname: member['firstname'],
+          lastname: member['lastname'],
+          image: member['image'],
+          isAdmin: member['isAdmin'],
+          joinedAt: member['joinedAt'],
+        ));
+      }
+    }
+
+    final userMap = {
+      for (var member in groupMembersList) member.userId: member
+    };
+
     final response = await Api.getForumChatMessages(
       forumId: forumId,
       cityId: cityId,
-      lastMessageId: currentMessages.isNotEmpty ? currentMessages.last.id : 0,
+      lastMessageId: 0,
       offset: _currentOffset,
     );
 
-    if (response.data != null) {
+    if (response.data != null && (response.data as List).isNotEmpty) {
       final newMessages =
           await Future.wait((response.data as List).map((messageData) async {
         final message = ChatMessageModel.fromJson(messageData);
+        final user = userMap[message.senderId];
 
         String decryptedMessage = messageData['message'];
         if (isPrivate) {
@@ -368,7 +403,11 @@ class GroupDetailsCubit extends Cubit<GroupDetailsState> {
           }
         }
 
-        return message.copyWith(message: decryptedMessage);
+        return message.copyWith(
+          message: decryptedMessage,
+          username: user?.username ?? "Unknown",
+          avatarUrl: user?.image ?? "admin/ProfilePicture.png",
+        );
       }));
 
       final updatedMessages = [...currentMessages, ...newMessages];

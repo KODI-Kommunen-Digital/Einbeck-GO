@@ -3,6 +3,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:heidi/src/data/model/model.dart';
 import 'package:heidi/src/data/model/model_chat_message.dart';
 import 'package:heidi/src/data/model/model_comment.dart';
@@ -11,6 +12,7 @@ import 'package:heidi/src/data/model/model_forum_status.dart';
 import 'package:heidi/src/data/model/model_product.dart';
 import 'package:heidi/src/data/model/model_request_member.dart';
 import 'package:heidi/src/data/remote/api/api.dart';
+import 'package:heidi/src/data/remote/api/firebase_api.dart';
 import 'package:heidi/src/utils/configs/application.dart';
 import 'package:heidi/src/utils/configs/key_helper.dart';
 import 'package:heidi/src/utils/configs/preferences.dart';
@@ -182,6 +184,7 @@ class ForumRepository {
     );
 
     if (response.success) {
+      handleGroupChatSubscription(forumId, true);
       // Set the isPrivate flag based on the response
       isPrivate = response.data['isPrivate'] == 1;
 
@@ -196,7 +199,7 @@ class ForumRepository {
 
       // Fetch initial chat messages
       try {
-        final chatMessagesResponse = await requestChatMessages(forumId, 0, 20);
+        final chatMessagesResponse = await requestChatMessages(forumId, 0, 1);
         if (chatMessagesResponse != null && chatMessagesResponse.success) {
           response.data['chatMessages'] = chatMessagesResponse.data;
         } else {
@@ -632,6 +635,7 @@ class ForumRepository {
     final response = await Api.requestDeleteForum(
         cityId == 0 ? cityIdPref : cityId, forumId);
     if (response.success) {
+      handleGroupChatSubscription(forumId, false);
       return response;
     } else {
       logError('Delete Forum Failed', response.message);
@@ -795,6 +799,21 @@ class ForumRepository {
     } else {
       logError('Get Comment Replies Failed', response.message);
       return [];
+    }
+  }
+
+  Future<void> handleGroupChatSubscription(int forumId, bool subscribe) async {
+    final prefs = await Preferences.openBox();
+    int cityId = prefs.getKeyValue(Preferences.cityId, 0);
+
+    final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+    final firebaseApi = FirebaseApi(navigatorKey, prefs);
+    final topic = "groupChat_city_${cityId}_forum_$forumId";
+
+    if (subscribe) {
+      await firebaseApi.subscribeToTopic(topic);
+    } else {
+      await firebaseApi.unsubscribeFromTopic(topic);
     }
   }
 }
