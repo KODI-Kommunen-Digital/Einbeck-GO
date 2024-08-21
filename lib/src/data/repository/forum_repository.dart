@@ -185,17 +185,17 @@ class ForumRepository {
 
     if (response.success) {
       handleGroupChatSubscription(forumId, true);
-      // Set the isPrivate flag based on the response
-      isPrivate = response.data['isPrivate'] == 1;
+      isPrivate = false;
 
-      // If the forum is private, fetch and save forum keys
-      if (isPrivate) {
-        try {
-          await fetchUserGroupKeys(forumId);
-        } catch (e) {
-          logError('Failed to fetch and save forum keys', e.toString());
-        }
-      }
+      // isPrivate = response.data['isPrivate'] == 1;
+
+      // if (isPrivate) {
+      //   try {
+      //     await fetchUserGroupKeys(forumId);
+      //   } catch (e) {
+      //     logError('Failed to fetch and save forum keys', e.toString());
+      //   }
+      // }
 
       // Fetch initial chat messages
       try {
@@ -810,10 +810,22 @@ class ForumRepository {
     final firebaseApi = FirebaseApi(navigatorKey, prefs);
     final topic = "groupChat_city_${cityId}_forum_$forumId";
 
+    List<String> forumChatTopics = prefs.getForumChatTopics();
+
     if (subscribe) {
       await firebaseApi.subscribeToTopic(topic);
+
+      if (!forumChatTopics.contains(topic)) {
+        forumChatTopics.add(topic);
+        await prefs.setForumChatTopics(forumChatTopics);
+      }
     } else {
       await firebaseApi.unsubscribeFromTopic(topic);
+
+      if (forumChatTopics.contains(topic)) {
+        forumChatTopics.remove(topic);
+        await prefs.setForumChatTopics(forumChatTopics);
+      }
     }
   }
 }

@@ -1,4 +1,5 @@
 // ignore_for_file: use_build_context_synchronously
+
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:heidi/main_prod.dart';
 import 'package:heidi/src/data/remote/api/firebase_api.dart';
@@ -90,14 +91,15 @@ class _SettingsScreenState extends State<SettingsScreen>
       setState(() {
         _receiveNotification = false;
       });
-      checkNotificationPermissionStatus();
+      // No need to call checkNotificationPermissionStatus here
     } else {
+      await prefs.setKeyValue(
+          Preferences.receiveNotification, newValue ? 'true' : 'false');
+      await FirebaseApi(globalNavKey, prefs).refreshNotifications();
+
       setState(() {
         _receiveNotification = newValue;
       });
-      await prefs.setKeyValue(Preferences.receiveNotification,
-          _receiveNotification ? 'true' : 'false');
-      await FirebaseApi(globalNavKey, prefs).refreshNotifications();
     }
   }
 
@@ -197,11 +199,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                 activeColor: Theme.of(context).primaryColor,
                 value: _receiveNotification,
                 onChanged: (value) async {
-                  setState(() {
-                    _receiveNotification = value;
-                  });
                   await updateNotificationPermissionPreference(value);
-                  checkNotificationPermissionStatus();
                 },
               ),
             ),

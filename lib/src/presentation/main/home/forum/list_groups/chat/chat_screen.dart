@@ -96,6 +96,7 @@ class _ChatLoadedState extends State<ChatLoaded> {
     _fetchMessages(isInitialLoad: true);
     _connectWebsocket(widget.group.cityId ?? 1, widget.group.id);
     WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
+    _scrollController.addListener(_onScroll);
   }
 
   @override
@@ -107,10 +108,25 @@ class _ChatLoadedState extends State<ChatLoaded> {
     if (_bannerTimer != null) {
       _bannerTimer?.cancel();
     }
+    _scrollController.removeListener(_onScroll); // Remove the scroll listener
     _scrollController.dispose();
     _inputFocusNode.dispose();
     context.read<GroupDetailsCubit>().resetOffset();
     super.dispose();
+  }
+
+  void _onScroll() {
+    if (_isScrolledToBottom()) {
+      // Reset the unread message count when scrolled to bottom
+      setState(() {
+        _unreadMessageCount = 0;
+      });
+    }
+  }
+
+  bool _isScrolledToBottom() {
+    return _scrollController.offset >=
+        _scrollController.position.maxScrollExtent;
   }
 
   Future<void> _connectWebsocket(int? cityId, int? forumId) async {
@@ -129,14 +145,6 @@ class _ChatLoadedState extends State<ChatLoaded> {
 
       if (decodedEvent['type'] == "newMessage" &&
           decodedEvent['senderId'] != widget.userId) {
-        setState(() {
-          _unreadMessageCount += 1;
-          _showNewMessageBanner = true;
-        });
-        _startBannerTimer();
-        _fetchMessages(isInitialLoad: false);
-      } else {
-        // Fetch the message without showing the banner
         _fetchMessages(isInitialLoad: false);
       }
     }).onDone(() {
@@ -151,6 +159,40 @@ class _ChatLoadedState extends State<ChatLoaded> {
     });
   }
 
+  Future<void> _fetchMessages({required bool isInitialLoad}) async {
+    final List<ChatMessageModel> newMessages =
+        await context.read<GroupDetailsCubit>().receivePublicMessages(
+              context,
+              widget.group.id ?? 1,
+              widget.group.cityId == 0 ? 1 : widget.group.cityId,
+              isInitialLoad,
+            );
+
+    if (!isInitialLoad) {
+      // Check if any of the new messages are from other users
+      bool hasMessagesFromOthers =
+          newMessages.any((message) => message.senderId != widget.userId);
+
+      if (hasMessagesFromOthers && !_isScrolledToBottom()) {
+        setState(() {
+          _unreadMessageCount += 1;
+          _showNewMessageBanner = true;
+        });
+        _startBannerTimer();
+      } else if (_isScrolledToBottom()) {
+        // Reset the banner if scrolled to bottom
+        setState(() {
+          _unreadMessageCount = 0;
+          _showNewMessageBanner = false;
+        });
+      }
+    }
+
+    if (isInitialLoad) {
+      _scrollToBottom();
+    }
+  }
+
   void _startBannerTimer() {
     _bannerTimer?.cancel();
     _bannerTimer = Timer(const Duration(seconds: 3), () {
@@ -160,25 +202,6 @@ class _ChatLoadedState extends State<ChatLoaded> {
         });
       }
     });
-  }
-
-  Future<void> _fetchMessages({required bool isInitialLoad}) async {
-    if (isInitialLoad) {
-      context.read<GroupDetailsCubit>().receivePublicMessages(
-            context,
-            widget.group.id ?? 1,
-            widget.group.cityId == 0 ? 1 : widget.group.cityId,
-            isInitialLoad,
-          );
-      _scrollToBottom();
-    } else {
-      context.read<GroupDetailsCubit>().receivePublicMessages(
-            context,
-            widget.group.id ?? 1,
-            widget.group.cityId == 0 ? 1 : widget.group.cityId,
-            isInitialLoad,
-          );
-    }
   }
 
   @override

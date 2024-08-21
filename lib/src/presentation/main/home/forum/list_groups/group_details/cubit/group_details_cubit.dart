@@ -30,7 +30,9 @@ class GroupDetailsCubit extends Cubit<GroupDetailsState> {
   GroupDetailsCubit(this.repo, this.arguments)
       : super(const GroupDetailsStateLoading()) {
     forumId = arguments.id ?? 1;
-    isPrivate = arguments.isPrivate == 1;
+    isPrivate = false;
+
+    //     isPrivate = arguments.isPrivate == 1;
     onLoad(forumId);
   }
 
@@ -252,15 +254,16 @@ class GroupDetailsCubit extends Cubit<GroupDetailsState> {
       final user = userMap[message.senderId];
 
       String decryptedMessage = data['message'];
-      try {
-        if (isPrivate) {
-          decryptedMessage = await _attemptDecryption(
-              data['message'], forumId, data['groupKeyVersion']);
-        }
-      } catch (e) {
-        decryptedMessage = "Decryption failed";
-        logError('Failed to decrypt message ${data['id']}', e.toString());
-      }
+
+      // try {
+      //   if (isPrivate) {
+      //     decryptedMessage = await _attemptDecryption(
+      //         data['message'], forumId, data['groupKeyVersion']);
+      //   }
+      // } catch (e) {
+      //   decryptedMessage = "Decryption failed";
+      //   logError('Failed to decrypt message ${data['id']}', e.toString());
+      // }
 
       processedMessages.add(
         message.copyWith(
@@ -275,55 +278,55 @@ class GroupDetailsCubit extends Cubit<GroupDetailsState> {
     return processedMessages;
   }
 
-  Future<String> _attemptDecryption(
-      String encryptedMessage, int forumId, int groupKeyVersion) async {
-    String? groupKeyData = await KeyHelper.getForumKey(
-      forumId: forumId.toString(),
-      groupKeyVersion: groupKeyVersion,
-    );
+  // Future<String> _attemptDecryption(
+  //     String encryptedMessage, int forumId, int groupKeyVersion) async {
+  //   String? groupKeyData = await KeyHelper.getForumKey(
+  //     forumId: forumId.toString(),
+  //     groupKeyVersion: groupKeyVersion,
+  //   );
 
-    if (groupKeyData == null) {
-      await fetchUserGroupKeys(forumId, groupKeyVersions: [groupKeyVersion]);
-      groupKeyData = await KeyHelper.getForumKey(
-        forumId: forumId.toString(),
-        groupKeyVersion: groupKeyVersion,
-      );
-    }
+  //   if (groupKeyData == null) {
+  //     await fetchUserGroupKeys(forumId, groupKeyVersions: [groupKeyVersion]);
+  //     groupKeyData = await KeyHelper.getForumKey(
+  //       forumId: forumId.toString(),
+  //       groupKeyVersion: groupKeyVersion,
+  //     );
+  //   }
 
-    if (groupKeyData != null) {
-      try {
-        final decrypted =
-            KeyHelper.decryptMessage(encryptedMessage, groupKeyData);
-        final decryptedJson = jsonDecode(decrypted);
-        return decryptedJson['message'];
-      } catch (e) {
-        throw Exception('Decryption failed');
-      }
-    } else {
-      await fetchUserGroupKeys(forumId);
+  //   if (groupKeyData != null) {
+  //     try {
+  //       final decrypted =
+  //           KeyHelper.decryptMessage(encryptedMessage, groupKeyData);
+  //       final decryptedJson = jsonDecode(decrypted);
+  //       return decryptedJson['message'];
+  //     } catch (e) {
+  //       throw Exception('Decryption failed');
+  //     }
+  //   } else {
+  //     await fetchUserGroupKeys(forumId);
 
-      final latestGroupKeyVersion =
-          await KeyHelper.getStoredForumKeyVersion(forumId.toString());
-      if (latestGroupKeyVersion != null) {
-        groupKeyData = await KeyHelper.getForumKey(
-          forumId: forumId.toString(),
-          groupKeyVersion: latestGroupKeyVersion,
-        );
+  //     final latestGroupKeyVersion =
+  //         await KeyHelper.getStoredForumKeyVersion(forumId.toString());
+  //     if (latestGroupKeyVersion != null) {
+  //       groupKeyData = await KeyHelper.getForumKey(
+  //         forumId: forumId.toString(),
+  //         groupKeyVersion: latestGroupKeyVersion,
+  //       );
 
-        if (groupKeyData != null) {
-          try {
-            final decrypted =
-                KeyHelper.decryptMessage(encryptedMessage, groupKeyData);
-            final decryptedJson = jsonDecode(decrypted);
-            return decryptedJson['message'];
-          } catch (e) {
-            throw Exception('Decryption failed with latest group key');
-          }
-        }
-      }
-      throw Exception('Failed to retrieve group key');
-    }
-  }
+  //       if (groupKeyData != null) {
+  //         try {
+  //           final decrypted =
+  //               KeyHelper.decryptMessage(encryptedMessage, groupKeyData);
+  //           final decryptedJson = jsonDecode(decrypted);
+  //           return decryptedJson['message'];
+  //         } catch (e) {
+  //           throw Exception('Decryption failed with latest group key');
+  //         }
+  //       }
+  //     }
+  //     throw Exception('Failed to retrieve group key');
+  //   }
+  // }
 
   Future<void> sendMessage(
       BuildContext context, int forumId, String message) async {

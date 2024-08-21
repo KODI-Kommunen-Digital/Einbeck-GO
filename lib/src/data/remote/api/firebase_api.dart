@@ -36,8 +36,23 @@ class FirebaseApi {
   }
 
   Future<void> handleForegroundNotification(RemoteMessage message) async {
-    logInfo(
-        "Notification received in foreground: ${message.notification?.title}");
+    await _setForegroundNotificationPresentationOptions(
+      alert: false,
+      badge: false,
+      sound: false,
+    );
+  }
+
+  Future<void> _setForegroundNotificationPresentationOptions({
+    bool alert = false,
+    bool badge = false,
+    bool sound = false,
+  }) async {
+    await _firebaseMessaging.setForegroundNotificationPresentationOptions(
+      alert: alert,
+      badge: badge,
+      sound: sound,
+    );
   }
 
   Future<void> initNotifications() async {
@@ -98,10 +113,35 @@ class FirebaseApi {
 
     if (pushNotificationsPermission == "authorized" &&
         receiveNotification == "true") {
+      await _subscribeToAllForumChats();
       await _firebaseMessaging.subscribeToTopic("warnings");
     } else {
+      await _unsubscribeFromAllForumChats();
       await _firebaseMessaging.unsubscribeFromTopic("warnings");
     }
+  }
+
+  Future<void> _unsubscribeFromAllForumChats() async {
+    final List<String> forumChatTopics = await _getForumChatTopics();
+    for (String topic in forumChatTopics) {
+      await _firebaseMessaging.unsubscribeFromTopic(topic);
+      logInfo("Unsubscribed from forum chat topic: $topic");
+    }
+  }
+
+  Future<void> _subscribeToAllForumChats() async {
+    final List<String> forumChatTopics = await _getForumChatTopics();
+    for (String topic in forumChatTopics) {
+      await _firebaseMessaging.subscribeToTopic(topic);
+      logInfo("Subscribed to forum chat topic: $topic");
+    }
+  }
+
+  Future<List<String>> _getForumChatTopics() async {
+    final prefs = await Preferences.openBox();
+    final List<String>? forumChatTopics =
+        prefs.getKeyValue(Preferences.forumChatTopics, <String>[]);
+    return forumChatTopics ?? <String>[];
   }
 
   Future<void> uploadToken(int userId, String token) async {

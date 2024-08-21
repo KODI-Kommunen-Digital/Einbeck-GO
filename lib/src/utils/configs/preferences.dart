@@ -42,6 +42,8 @@ class Preferences {
   static const bool hasOpenedForumsBefore = false;
   static const String keyboardHeight = "0.0";
 
+  static const String forumChatTopics = 'forumChatTopics';
+
   Preferences._(this._box);
 
   static Future<Preferences> openBox() async {
@@ -82,4 +84,10 @@ class Preferences {
       _getValue<bool>(key, defaultValue);
 
   Future<void> setBool(String key, bool value) => _setValue<bool>(key, value);
+
+  Future<void> setForumChatTopics(List<String> topics) =>
+      _setValue<List<String>>(forumChatTopics, topics);
+
+  List<String> getForumChatTopics() =>
+      _getValue<List<String>>(forumChatTopics, <String>[]);
 }
