@@ -45,7 +45,7 @@ class _LegalScreenState extends State<LegalScreen> {
             AppListTitle(
               title: Translate.of(context).translate('imprint'),
               onPressed: () {
-                _makeAction('http://195.201.46.81:3000/ImprintPage');
+                _makeAction('https://app.einbeck.de/ImprintPage');
               },
               trailing: Row(
                 children: <Widget>[
@@ -62,7 +62,7 @@ class _LegalScreenState extends State<LegalScreen> {
             AppListTitle(
               title: Translate.of(context).translate('privacy_policy'),
               onPressed: () {
-                _makeAction('http://195.201.46.81:3000/PrivacyPolicy');
+                _makeAction('https://app.einbeck.de/PrivacyPolicy');
               },
               trailing: Row(
                 children: <Widget>[
@@ -79,7 +79,7 @@ class _LegalScreenState extends State<LegalScreen> {
             AppListTitle(
               title: Translate.of(context).translate('terms_of_use'),
               onPressed: () {
-                _makeAction('http://195.201.46.81:3000/TermsOfUse');
+                _makeAction('https://app.einbeck.de/TermsOfUse');
               },
               trailing: Row(
                 children: <Widget>[

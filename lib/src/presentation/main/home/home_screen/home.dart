@@ -159,10 +159,9 @@ class _HomeScreenState extends State<HomeScreen> {
               onPressed: () {
                 _searchListings();
               },
-              icon: Icon(
+              icon: const Icon(
                 Icons.search,
-                color: Theme.of(context).textTheme.bodyLarge?.color ??
-                    Colors.white,
+                color: Colors.white,
               ))
         ],
       ),
@@ -192,7 +191,8 @@ class _HomeScreenState extends State<HomeScreen> {
               selectedCityTitle = state.selectedCity!.title;
               selectedCityId = state.selectedCity!.id;
             } else {
-              selectedCityTitle = Translate.of(context).translate('select_location');
+              selectedCityTitle =
+                  Translate.of(context).translate('select_location');
               selectedCityId = 0;
             }
 

@@ -53,6 +53,10 @@ class _SettingsScreenState extends State<SettingsScreen>
   }
 
   Future<void> updateNotificationPermissionPreference(bool newValue) async {
+    setState(() {
+      _receiveNotification = newValue;
+    });
+
     final prefs = await Preferences.openBox();
     final pushNotificationsPermission = await prefs.getKeyValue(
         Preferences.pushNotificationsPermission, 'notAsked');
@@ -88,18 +92,11 @@ class _SettingsScreenState extends State<SettingsScreen>
           );
         },
       );
-      setState(() {
-        _receiveNotification = false;
-      });
-      // No need to call checkNotificationPermissionStatus here
     } else {
+      // Perform the background operation
       await prefs.setKeyValue(
           Preferences.receiveNotification, newValue ? 'true' : 'false');
       await FirebaseApi(globalNavKey, prefs).refreshNotifications();
-
-      setState(() {
-        _receiveNotification = newValue;
-      });
     }
   }
 

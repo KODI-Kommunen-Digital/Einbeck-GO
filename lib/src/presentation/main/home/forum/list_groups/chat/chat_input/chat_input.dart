@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:heidi/src/utils/translate.dart';
 
 class ChatInput extends StatefulWidget {
   final Function(String) onSend;
@@ -32,7 +33,9 @@ class _ChatInputState extends State<ChatInput> {
                 }
               },
               decoration: InputDecoration(
-                hintText: 'Type a message...',
+                hintText: Translate.of(context).translate(
+                  'type_message',
+                ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(20.0),
                 ),

@@ -52,8 +52,9 @@ class _ChatMessageListState extends State<ChatMessageList> {
   }
 
   String formatDate(String dateStr) {
-    final dateTime = DateTime.parse(dateStr);
-    return DateFormat('EEE MMM d yyyy, h:mm a', 'de').format(dateTime);
+    final dateTime = DateTime.parse(dateStr).add(const Duration(hours: 2));
+    return DateFormat('EEE, d. MMM yyyy, HH:mm \'Uhr\'', 'de_DE')
+        .format(dateTime);
   }
 
   @override
@@ -90,7 +91,9 @@ class _ChatMessageListState extends State<ChatMessageList> {
                       if (!isMe)
                         CircleAvatar(
                           backgroundImage: NetworkImage(
-                            '${Application.picturesURL}${message.avatarUrl}',
+                            message.avatarUrl == "Keine Angabe"
+                                ? '${Application.picturesURL}admin/ProfilePicture.png'
+                                : '${Application.picturesURL}${message.avatarUrl}',
                           ),
                         ),
                       if (!isMe) const SizedBox(width: 10),

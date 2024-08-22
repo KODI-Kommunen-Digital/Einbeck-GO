@@ -156,7 +156,11 @@ class _AllListingsLoadedState extends State<AllListingsLoaded> {
                   onPressed: () {
                     _searchListings();
                   },
-                  icon: Icon(Icons.search, color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,))
+                  icon: Icon(
+                    Icons.search,
+                    color: Theme.of(context).textTheme.bodyLarge?.color ??
+                        Colors.white,
+                  ))
             ],
           ),
         ],
@@ -372,10 +376,17 @@ class _AllListingsLoadedState extends State<AllListingsLoaded> {
                                                                 .circular(10),
                                                       ),
                                                       child: ElevatedButton(
-                                                        style: ElevatedButton.styleFrom(
-                                                          backgroundColor: Theme.of(context).primaryColor,
-                                                          shape: RoundedRectangleBorder(
-                                                            borderRadius: BorderRadius.circular(8),
+                                                        style: ElevatedButton
+                                                            .styleFrom(
+                                                          backgroundColor:
+                                                              Theme.of(context)
+                                                                  .primaryColor,
+                                                          shape:
+                                                              RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        8),
                                                           ),
                                                         ),
                                                         onPressed: () async {
@@ -603,8 +614,12 @@ class _AllListingsLoadedState extends State<AllListingsLoaded> {
                   return SimpleDialog(
                       title: Center(
                         child: Text(Translate.of(context).translate('status'),
-                            style: const TextStyle(
-                              color: Colors.white,
+                            style: TextStyle(
+                              color: Theme.of(context)
+                                      .textTheme
+                                      .bodyLarge
+                                      ?.color ??
+                                  Colors.white,
                               fontWeight: FontWeight.bold,
                             )),
                       ),
