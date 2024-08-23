@@ -17,7 +17,7 @@ class FirebaseApi {
 
   Future<void> handleMessageOnUserInteraction(RemoteMessage? message) async {
     if (message != null) {
-      if (message.from != null && message.from!.contains("groupChat")) {
+      if (message.data["forumId"] != null) {
         final int cityId = int.parse(message.data["cityId"]);
 
         navigatorKey.currentState?.pushNamed(
@@ -36,26 +36,21 @@ class FirebaseApi {
   }
 
   Future<void> handleForegroundNotification(RemoteMessage message) async {
-    await _setForegroundNotificationPresentationOptions(
+    await _firebaseMessaging.setForegroundNotificationPresentationOptions(
       alert: false,
       badge: false,
       sound: false,
     );
   }
 
-  Future<void> _setForegroundNotificationPresentationOptions({
-    bool alert = false,
-    bool badge = false,
-    bool sound = false,
-  }) async {
-    await _firebaseMessaging.setForegroundNotificationPresentationOptions(
-      alert: alert,
-      badge: badge,
-      sound: sound,
-    );
-  }
-
   Future<void> initNotifications() async {
+    await FirebaseMessaging.instance
+        .setForegroundNotificationPresentationOptions(
+      alert: false,
+      badge: false,
+      sound: false,
+    );
+
     NotificationSettings settings = await _firebaseMessaging.requestPermission(
       alert: true,
       badge: true,
@@ -76,8 +71,10 @@ class FirebaseApi {
 
     if (pushNotificationsPermission == "authorized" &&
         receiveNotification == "true") {
+      await _subscribeToAllForumChats();
       await _firebaseMessaging.subscribeToTopic("warnings");
     } else {
+      await _unsubscribeFromAllForumChats();
       await _firebaseMessaging.unsubscribeFromTopic("warnings");
     }
 
@@ -87,9 +84,8 @@ class FirebaseApi {
       if (token != null) uploadToken(uId, token);
     }
 
-    await FirebaseMessaging.instance
-        .setForegroundNotificationPresentationOptions(
-            alert: true, badge: true, sound: true);
+    FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+        alert: false, badge: false, sound: false);
 
     _firebaseMessaging.getInitialMessage().then(handleMessageOnUserInteraction);
     FirebaseMessaging.onMessage.listen(handleForegroundNotification);

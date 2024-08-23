@@ -78,9 +78,9 @@ class SignUpCubit extends Cubit<SignUpState> {
       return 'Username cannot contain spaces';
     }
 
-    if (!RegExp(r'^[a-z_]+$').hasMatch(username)) {
-      return "Großbuchstaben sind nicht möglich";
-    }
+    // if (!RegExp(r'^[a-z_]+$').hasMatch(username)) {
+    //   return "Großbuchstaben sind nicht möglich";
+    // }
 
     return null; // Username is valid.
   }

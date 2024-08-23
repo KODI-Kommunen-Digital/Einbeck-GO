@@ -359,13 +359,21 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   void _showErrorSnackBar([String? message]) {
-    final translatedMessage = message?.isNotEmpty == true
-        ? message
-        : Translate.of(context).translate("register_fail");
+    String translatedMessage;
+
+    if (message != null && message.contains("already exists")) {
+      final username = RegExp(r"'(.*?)'").firstMatch(message)?.group(1) ?? '';
+      translatedMessage =
+          "Ein Benutzer mit dem Benutzernamen '$username' existiert bereits.";
+    } else {
+      translatedMessage = (message?.isNotEmpty == true
+          ? message
+          : Translate.of(context).translate("register_fail"))!;
+    }
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(translatedMessage!),
+        content: Text(translatedMessage),
       ),
     );
   }
