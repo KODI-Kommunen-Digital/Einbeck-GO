@@ -212,26 +212,28 @@ class _ListProductScreenState extends State<ListProductScreen> {
                             color: Colors.white,
                           ),
                         ),
-                      if (!isCategoryService)
-                        AppFilterButton(
-                          voidCallback: () {
-                            MultiFilter multiFilter = whatCanFilter(isEvent);
-                            Navigator.pushNamed(context, Routes.filterScreen,
-                                    arguments: {"multifilter": multiFilter})
-                                .then((filter) => {
-                                      if (filter != null)
-                                        {
-                                          _updateSelectedFilter(
-                                              filter as MultiFilter)
-                                        }
-                                    });
-                          },
-                        ),
+                      AppFilterButton(
+                        voidCallback: () {
+                          MultiFilter multiFilter = whatCanFilter(isEvent);
+                          Navigator.pushNamed(context, Routes.filterScreen,
+                              arguments: {
+                                "multifilter": multiFilter
+                              }).then((filter) => {
+                                if (filter != null)
+                                  {_updateSelectedFilter(filter as MultiFilter)}
+                              });
+                        },
+                      ),
                       IconButton(
                           onPressed: () {
                             _searchListings();
                           },
-                          icon: Icon(Icons.search, color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white,))
+                          icon: Icon(
+                            Icons.search,
+                            color:
+                                Theme.of(context).textTheme.bodyLarge?.color ??
+                                    Colors.white,
+                          ))
                     ],
                   );
                 }
