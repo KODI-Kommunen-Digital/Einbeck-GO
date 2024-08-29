@@ -758,7 +758,7 @@ class _HomeScreenState extends State<HomeScreen> {
       itemCount: 8,
     );
 
-    if (recent != null) {
+    if (recent != null && recent.isNotEmpty) {
       content = ListView.builder(
         shrinkWrap: true,
         padding: const EdgeInsets.all(0),
@@ -796,6 +796,20 @@ class _HomeScreenState extends State<HomeScreen> {
         },
         itemCount: recent.length,
       );
+    } else {
+      content = Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          const Icon(Icons.sentiment_satisfied),
+          Padding(
+            padding: const EdgeInsets.all(4.0),
+            child: Text(
+              Translate.of(context).translate('list_is_empty'),
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+          ),
+        ],
+      );
     }
 
     return Column(
@@ -816,6 +830,10 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
         ),
+        if (recent != null && recent.isEmpty)
+          const SizedBox(
+            height: 64,
+          ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: content,
