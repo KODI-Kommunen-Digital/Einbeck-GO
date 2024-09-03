@@ -50,7 +50,7 @@ After setting up your development environment, follow these steps to build and r
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/EinbeckGO.git
+   https://github.com/KODI-Kommunen-Digital/Einbeck_App.git
    cd EinbeckGO
    ```
 
@@ -130,7 +130,7 @@ Nachdem Sie Ihre Entwicklungsumgebung eingerichtet haben, führen Sie die folgen
 
 1. Klonen Sie das Repository:
    ```bash
-   git clone https://github.com/yourusername/EinbeckGO.git
+   https://github.com/KODI-Kommunen-Digital/Einbeck_App.git
    cd EinbeckGO
    ```
 
