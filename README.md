@@ -80,7 +80,7 @@ We welcome contributions from the community to help make **EinbeckGO** even bett
 
 ### **License**
 
-This project is licensed under the MIT License – see the [LICENSE](LICENSE) file for details.
+This project is licensed under the Apache-2.0 License.
 
 ---
 
@@ -160,4 +160,4 @@ Wir begrüßen Beiträge aus der Gemeinschaft, um **EinbeckGO** noch besser zu m
 
 ### **Lizenz**
 
-Dieses Projekt ist unter der MIT-Lizenz lizenziert – siehe die [LICENSE](LICENSE) Datei für Details.
+Dieses Projekt ist unter der Apache-2.0 lizenziert.
