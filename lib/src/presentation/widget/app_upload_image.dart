@@ -2,6 +2,7 @@
 
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:device_info/device_info.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:file_picker/file_picker.dart';
@@ -238,7 +239,9 @@ class _AppUploadImageState extends State<AppUploadImage> {
         setState(() {
           isImageUploaded = false;
           _file = File(pickedFile.path);
-          widget.onChange([]);
+          if (_file != null) {
+            widget.onChange([_file!]);
+          }
         });
         final profile = widget.profile;
         final forumGroup = widget.forumGroup;
@@ -255,7 +258,7 @@ class _AppUploadImageState extends State<AppUploadImage> {
               isImageUploaded = true;
             });
             final item = response.data['data']?['image'];
-            widget.onChange(item);
+            widget.onChange([File(item)]);
           } else {
             logError('Image Upload Permission Error', response);
           }
@@ -388,7 +391,7 @@ class _AppUploadImageState extends State<AppUploadImage> {
                             isImageUploaded = true;
                           });
                           final item = response.data['data']?['image'];
-                          widget.onChange(item);
+                          widget.onChange([File(item)]);
                         }
                       }
                     }
@@ -433,6 +436,29 @@ class _AppUploadImageState extends State<AppUploadImage> {
               ),
             ));
       }
+    } else if (image != null && image!.contains('profilePic')) {
+      return SizedBox(
+          width: double.infinity,
+          height: 400,
+          child: RawGestureDetector(
+              gestures: {
+                AllowMultipleGestureRecognizer:
+                    GestureRecognizerFactoryWithHandlers<
+                        AllowMultipleGestureRecognizer>(
+                  () => AllowMultipleGestureRecognizer(),
+                  (AllowMultipleGestureRecognizer instance) {
+                    instance.onTap = () => showChooseFileTypeDialog();
+                  },
+                )
+              },
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(200),
+                child: CachedNetworkImage(
+                  imageUrl:
+                      "${Application.picturesURL}${image!}?cacheKey=$uniqueKey",
+                  fit: BoxFit.fill,
+                ),
+              )));
     }
     switch (widget.type) {
       case UploadImageType.circle:
