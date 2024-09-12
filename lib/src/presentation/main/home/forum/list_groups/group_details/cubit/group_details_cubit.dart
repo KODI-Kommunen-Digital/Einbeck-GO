@@ -32,7 +32,7 @@ class GroupDetailsCubit extends Cubit<GroupDetailsState> {
     forumId = arguments.id ?? 1;
     isPrivate = false;
 
-    //     isPrivate = arguments.isPrivate == 1;
+    isPrivate = arguments.isPrivate == 1;
     onLoad(forumId);
   }
 
