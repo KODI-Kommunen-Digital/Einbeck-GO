@@ -138,6 +138,7 @@ flutter:
     - assets/images/
     - assets/locale/
     - assets/data/
+    - shorebird.yaml
 
   fonts:
     - family: Poppins
