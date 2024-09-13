@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:device_info/device_info.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:heidi/src/data/model/model_device.dart';
 import 'package:location/location.dart';
@@ -25,7 +25,7 @@ class Utils {
       if (Platform.isAndroid) {
         final android = await deviceInfoPlugin.androidInfo;
         return DeviceModel(
-          uuid: android.androidId,
+          uuid: android.id,
           model: "Android",
           version: android.version.sdkInt.toString(),
           type: android.model,
@@ -33,7 +33,7 @@ class Utils {
       } else if (Platform.isIOS) {
         final IosDeviceInfo ios = await deviceInfoPlugin.iosInfo;
         return DeviceModel(
-          uuid: ios.identifierForVendor,
+          uuid: ios.identifierForVendor!,
           name: ios.name,
           model: ios.systemName,
           version: ios.systemVersion,
