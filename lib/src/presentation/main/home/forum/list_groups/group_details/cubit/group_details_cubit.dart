@@ -261,8 +261,9 @@ class GroupDetailsCubit extends Cubit<GroupDetailsState> {
               data['message'], forumId, data['groupKeyVersion']);
         }
       } catch (e) {
-        decryptedMessage = "Decryption failed";
+        // decryptedMessage = "Decryption failed";
         logError('Failed to decrypt message ${data['id']}', e.toString());
+        continue;
       }
 
       processedMessages.add(
