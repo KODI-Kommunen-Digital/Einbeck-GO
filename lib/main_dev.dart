@@ -51,7 +51,7 @@ Future<void> main() async {
 
   await SentryFlutter.init((options) {
     options.dsn =
-        'https://a4fb5224118623425d802bf0acaf087b@o4506393481510912.ingest.sentry.io/4506393482493952';
+        'https://ecc6ca9e3175e2a2eac810d799f5d26b@o4507264812908544.ingest.de.sentry.io/4507967972835408';
     options.tracesSampleRate = 0.01;
   }, appRunner: () => runApp(HeidiApp(prefBox)));
 }
