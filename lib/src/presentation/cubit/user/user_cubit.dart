@@ -18,6 +18,10 @@ class UserCubit extends Cubit<UserModel?> {
     UserModel? local = await UserRepository.loadUser();
     UserModel? remote = await UserRepository.fetchUser(userId);
     if (local != null && remote != null) {
+      if(remote.firstname == 'hidden' && remote.lastname == 'hidden' && remote.email.contains('*')) {
+        await UserRepository.loadFavoritesListDetail(userId);
+        onFetchUser();
+      }
       final sync = local.updateUser(
         username: remote.username,
         firstname: remote.firstname,
