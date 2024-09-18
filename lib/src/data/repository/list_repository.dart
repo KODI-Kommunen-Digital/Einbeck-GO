@@ -10,7 +10,6 @@ import 'package:heidi/src/data/model/model_multifilter.dart';
 import 'package:heidi/src/data/model/model_product.dart';
 import 'package:heidi/src/data/remote/api/api.dart';
 import 'package:heidi/src/data/repository/user_repository.dart';
-import 'package:heidi/src/presentation/cubit/app_bloc.dart';
 import 'package:heidi/src/utils/configs/application.dart';
 import 'package:heidi/src/utils/configs/preferences.dart';
 import 'package:heidi/src/utils/logger.dart';
@@ -175,9 +174,6 @@ class ListRepository {
     if (profile) {
       await prefs.setPickedFile(formData);
       final response = await Api.requestUploadImage(formData);
-      if (response.success) {
-        AppBloc.userCubit.onFetchUser();
-      }
       return response;
     } else if (!profile) {
       await prefs.setPickedFile(formData);

@@ -6,6 +6,7 @@ import 'package:heidi/src/data/model/model_category.dart';
 import 'package:heidi/src/data/model/model_favorite.dart';
 import 'package:heidi/src/data/model/model_favorites_detail_list.dart';
 import 'package:heidi/src/data/remote/api/api.dart';
+import 'package:heidi/src/presentation/cubit/app_bloc.dart';
 import 'package:heidi/src/utils/configs/preferences.dart';
 import 'package:heidi/src/utils/logging/loggy_exp.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
@@ -156,6 +157,7 @@ class UserRepository {
     required String email,
     required String url,
     required String description,
+    bool isImageChanged = false,
     String? image,
   }) async {
     Map<String, dynamic> params = {
@@ -173,17 +175,21 @@ class UserRepository {
     final userId = prefs.getKeyValue(Preferences.userId, '');
     final response = await Api.requestChangeProfile(params, userId);
     if (response.success) {
-      FormData? pickedFile = prefs.getPickedFile();
-      if (pickedFile != null) {
-        final responseImageUpload = await Api.requestUploadImage(pickedFile);
-        if (responseImageUpload.success) {
-          return true;
+      if (isImageChanged) {
+        FormData? pickedFile = prefs.getPickedFile();
+        if (pickedFile != null) {
+          final responseImageUpload = await Api.requestUploadImage(pickedFile);
+          if (responseImageUpload.success) {
+            return true;
+          } else {
+            logError('Image Upload Error Response', response.message);
+          }
         } else {
-          logError('Image Upload Error Response', response.message);
+          return true;
         }
-      } else {
-        return true;
       }
+      await AppBloc.userCubit.onFetchUser();
+      return true;
     }
     return false;
   }
