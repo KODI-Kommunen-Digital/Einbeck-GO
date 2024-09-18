@@ -25,13 +25,8 @@ class _ChatInputState extends State<ChatInput> {
               controller: _controller,
               focusNode: widget.focusNode,
               textInputAction: TextInputAction.newline,
-              onSubmitted: (value) {
-                if (_controller.text.isNotEmpty) {
-                  widget.onSend(_controller.text);
-                  _controller.clear();
-                  widget.focusNode.requestFocus();
-                }
-              },
+              keyboardType: TextInputType.multiline,
+              maxLines: null,
               decoration: InputDecoration(
                 hintText: Translate.of(context).translate(
                   'type_message',
