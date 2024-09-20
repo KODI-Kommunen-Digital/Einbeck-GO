@@ -157,26 +157,26 @@ class ForumRepository {
 
     // Check if public key exists for the user
     bool keyExists = await KeyHelper.checkIfKeyExists(userId.toString());
-    if (!keyExists) {
+    // if (!keyExists) {
+    try {
+      await KeyHelper.generateAndStoreRSAKeyPair(userId.toString());
+      String? publicKey;
       try {
-        await KeyHelper.generateAndStoreRSAKeyPair(userId.toString());
-        String? publicKey;
-        try {
-          publicKey = await KeyHelper.getPublicKey(userId.toString());
-          Map<String, String> params = {'publicKey': publicKey};
-          ResultApiModel keyUpdateResponse =
-              await Api.updateForumKeys(params: params);
-          // Handle the keyUpdateResponse if needed
-          if (!keyUpdateResponse.success) {
-            logError('Failed to update forum keys', keyUpdateResponse.message);
-          }
-        } catch (e) {
-          logError('Failed to retrieve public key', e.toString());
+        publicKey = await KeyHelper.getPublicKey(userId.toString());
+        Map<String, String> params = {'publicKey': publicKey};
+        ResultApiModel keyUpdateResponse =
+            await Api.updateForumKeys(params: params);
+        // Handle the keyUpdateResponse if needed
+        if (!keyUpdateResponse.success) {
+          logError('Failed to update forum keys', keyUpdateResponse.message);
         }
       } catch (e) {
-        logError('Failed to generate RSA key pair', e.toString());
+        logError('Failed to retrieve public key', e.toString());
       }
+    } catch (e) {
+      logError('Failed to generate RSA key pair', e.toString());
     }
+    // }
 
     // Fetch group details
     final response = await Api.requestGroupDetails(
@@ -608,22 +608,22 @@ class ForumRepository {
       }
       prefs.deleteKey('pickedFile');
       bool keyExists = await KeyHelper.checkIfKeyExists(userId.toString());
-      if (!keyExists) {
+      // if (!keyExists) {
+      try {
+        await KeyHelper.generateAndStoreRSAKeyPair(userId.toString());
+        String? publicKey;
         try {
-          await KeyHelper.generateAndStoreRSAKeyPair(userId.toString());
-          String? publicKey;
-          try {
-            publicKey = await KeyHelper.getPublicKey(userId.toString());
-            Map<String, String> params = {'publicKey': publicKey};
-            ResultApiModel keyUpdateResponse =
-                await Api.updateForumKeys(params: params);
-          } catch (e) {
-            logError('Failed to retrieve public key', e.toString());
-          }
+          publicKey = await KeyHelper.getPublicKey(userId.toString());
+          Map<String, String> params = {'publicKey': publicKey};
+          ResultApiModel keyUpdateResponse =
+              await Api.updateForumKeys(params: params);
         } catch (e) {
-          logError('Failed to generate RSA key pair', e.toString());
+          logError('Failed to retrieve public key', e.toString());
         }
+      } catch (e) {
+        logError('Failed to generate RSA key pair', e.toString());
       }
+      // }
     }
     return response;
   }
