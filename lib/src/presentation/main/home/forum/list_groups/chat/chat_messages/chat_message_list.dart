@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -5,6 +6,7 @@ import 'package:heidi/src/utils/configs/application.dart';
 import 'package:intl/intl.dart';
 import 'package:heidi/src/presentation/main/home/forum/list_groups/group_details/cubit/group_details_cubit.dart';
 import 'package:heidi/src/presentation/main/home/forum/list_groups/group_details/cubit/group_details_state.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ChatMessageList extends StatefulWidget {
   final ScrollController scrollController;
@@ -33,6 +35,67 @@ class _ChatMessageListState extends State<ChatMessageList> {
   void dispose() {
     widget.scrollController.removeListener(_scrollListener);
     super.dispose();
+  }
+
+  Widget _buildMessageContent(String messageText) {
+    final urlPattern = RegExp(r'((https?:\/\/)?(www\.)[^\s]+)');
+    final List<InlineSpan> textSpans = [];
+
+    int lastIndex = 0;
+    final matches = urlPattern.allMatches(messageText);
+
+    for (final match in matches) {
+      if (match.start > lastIndex) {
+        textSpans.add(
+          TextSpan(
+            text: messageText.substring(lastIndex, match.start),
+            style: const TextStyle(color: Colors.white),
+          ),
+        );
+      }
+
+      final url = match.group(0);
+      textSpans.add(
+        TextSpan(
+          text: url,
+          style: const TextStyle(
+            color: Colors.blue,
+            decoration: TextDecoration.underline,
+          ),
+          recognizer: TapGestureRecognizer()
+            ..onTap = () {
+              _launchURL(url!);
+            },
+        ),
+      );
+
+      lastIndex = match.end;
+    }
+
+    if (lastIndex < messageText.length) {
+      textSpans.add(
+        TextSpan(
+          text: messageText.substring(lastIndex),
+          style: const TextStyle(color: Colors.white),
+        ),
+      );
+    }
+
+    return RichText(
+      text: TextSpan(
+        children: textSpans,
+      ),
+      softWrap: true,
+    );
+  }
+
+  void _launchURL(String url) async {
+    final validUrl = url.startsWith('http') ? url : 'https://$url';
+    if (await canLaunch(validUrl)) {
+      await launch(validUrl);
+    } else {
+      throw 'Could not launch $validUrl';
+    }
   }
 
   Future<void> _scrollListener() async {
@@ -137,14 +200,8 @@ class _ChatMessageListState extends State<ChatMessageList> {
                                     : const Color(0xFF202123),
                                 borderRadius: BorderRadius.circular(20),
                               ),
-                              child: Text(
-                                message.message ?? 'No message',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.white,
-                                ),
-                                softWrap: true,
-                              ),
+                              child: _buildMessageContent(
+                                  message.message ?? 'No message'),
                             ),
                           ),
                           Text(

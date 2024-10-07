@@ -266,10 +266,11 @@ class _ChatLoadedState extends State<ChatLoaded> {
                       'isNewGroup': false,
                       'forumDetails': widget.group
                     }).then((value) async {
-                      await context
-                          .read<GroupDetailsCubit>()
-                          .onLoad(widget.group.id);
-                      setState(() {});
+                      if (value == true) {
+                        await context
+                            .read<GroupDetailsCubit>()
+                            .onLoad(widget.group.id);
+                      }
                     });
                   }
                 },

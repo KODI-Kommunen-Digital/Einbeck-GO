@@ -67,13 +67,6 @@ class ChatMessageItem extends StatelessWidget {
                   style: TextStyle(color: isMe ? Colors.white : Colors.black),
                 ),
               ),
-            const Padding(
-              padding: EdgeInsets.only(top: 4.0),
-              child: Text(
-                'Fri Jul 12 2024', // Static date for now, you can update it dynamically as needed
-                style: TextStyle(fontSize: 10, color: Colors.grey),
-              ),
-            ),
           ],
         ),
         if (isMe) const SizedBox(width: 10),
