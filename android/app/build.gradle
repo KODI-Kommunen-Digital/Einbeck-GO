@@ -35,6 +35,7 @@ if (keystorePropertiesFile.exists()) {
  }
 
 android {
+    namespace 'com.einbeck.einbeckgo'
     compileSdkVersion flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
 
