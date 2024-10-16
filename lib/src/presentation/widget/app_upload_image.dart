@@ -459,6 +459,27 @@ class _AppUploadImageState extends State<AppUploadImage> {
                   fit: BoxFit.fill,
                 ),
               )));
+    } else if (image != null && image!.contains('forum')) {
+      return SizedBox(
+          width: double.infinity,
+          height: 400,
+          child: RawGestureDetector(
+            gestures: {
+              AllowMultipleGestureRecognizer:
+                  GestureRecognizerFactoryWithHandlers<
+                      AllowMultipleGestureRecognizer>(
+                () => AllowMultipleGestureRecognizer(),
+                (AllowMultipleGestureRecognizer instance) {
+                  instance.onTap = () => showChooseFileTypeDialog();
+                },
+              )
+            },
+            child: CachedNetworkImage(
+              imageUrl:
+                  "${Application.picturesURL}${image!}?cacheKey=$uniqueKey",
+              fit: BoxFit.fill,
+            ),
+          ));
     }
     switch (widget.type) {
       case UploadImageType.circle:
