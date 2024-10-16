@@ -685,7 +685,7 @@ class Api {
       required int? lastMessageId,
       required int offset}) async {
     String filepath =
-        "/cities/$cityId/forums/$forumId/chat/v2?pageNo=$offset&pageSize=15";
+        "/cities/$cityId/forums/$forumId/chat?pageNo=$offset&pageSize=15";
 
     if (lastMessageId != null && lastMessageId > 0) {
       filepath += "&lastMessageId=$lastMessageId";
@@ -701,7 +701,7 @@ class Api {
       {required int forumId,
       required int cityId,
       required String params}) async {
-    final String filepath = "/cities/$cityId/forums/$forumId/chat/v2";
+    final String filepath = "/cities/$cityId/forums/$forumId/chat";
     final result = await HTTPManager(forum: true).post(
       url: filepath,
       data: params,
