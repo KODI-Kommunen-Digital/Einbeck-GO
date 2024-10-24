@@ -603,7 +603,7 @@ class ForumRepository {
     final response = await Api.requestSaveForum(cityId, params);
     if (response.success) {
       final forumId = response.id;
-      if (pickedFile != null) {
+      if (pickedFile != null && pickedFile.files.isNotEmpty) {
         await Api.requestForumImageUpload(cityId, forumId, pickedFile);
       }
       prefs.deleteKey('pickedFile');
