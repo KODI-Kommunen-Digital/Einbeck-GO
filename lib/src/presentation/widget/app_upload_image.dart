@@ -127,35 +127,36 @@ class _AppUploadImageState extends State<AppUploadImage> {
               child: _buildContent(),
             ),
           ),
-          Visibility(
-            visible: _file != null &&
-                !_file!.path.contains('pdf') &&
-                selectedAssets.length != 1,
-            child: Positioned(
-              top: -10,
-              right: -10,
-              child: IconButton(
-                icon: Icon(
-                  Icons.delete,
-                  color: Colors.red[900],
+          if (!widget.forumGroup)
+            Visibility(
+              visible: _file != null &&
+                  !_file!.path.contains('pdf') &&
+                  selectedAssets.length != 1,
+              child: Positioned(
+                top: -10,
+                right: -10,
+                child: IconButton(
+                  icon: Icon(
+                    Icons.delete,
+                    color: Colors.red[900],
+                  ),
+                  onPressed: () {
+                    widget.onDelete!();
+                    setState(() {
+                      image = null;
+                      // images.removeAt(0);
+                      if (selectedAssets.length > 1) {
+                        context.read<AddListingCubit>().removeAssetsByIndex(0);
+                      }
+                      _file = null;
+                      if (images.isNotEmpty) {
+                        _file ??= File(images[0].path);
+                      }
+                    });
+                  },
                 ),
-                onPressed: () {
-                  widget.onDelete!();
-                  setState(() {
-                    image = null;
-                    // images.removeAt(0);
-                    if (selectedAssets.length > 1) {
-                      context.read<AddListingCubit>().removeAssetsByIndex(0);
-                    }
-                    _file = null;
-                    if (images.isNotEmpty) {
-                      _file ??= File(images[0].path);
-                    }
-                  });
-                },
               ),
             ),
-          ),
           Positioned.fill(child: circle),
         ],
       ),
@@ -436,7 +437,9 @@ class _AppUploadImageState extends State<AppUploadImage> {
               ),
             ));
       }
-    } else if (image != null && image!.contains('profilePic')) {
+    } else if (image != null &&
+        image!.contains('profilePic') &&
+        !widget.forumGroup) {
       return SizedBox(
           width: double.infinity,
           height: 400,
@@ -459,7 +462,7 @@ class _AppUploadImageState extends State<AppUploadImage> {
                   fit: BoxFit.fill,
                 ),
               )));
-    } else if (image != null && image!.contains('forum')) {
+    } else if (image != null && widget.forumGroup) {
       return SizedBox(
           width: double.infinity,
           height: 400,

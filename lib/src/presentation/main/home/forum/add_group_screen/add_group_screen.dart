@@ -131,7 +131,7 @@ class _AddGroupScreenState extends State<AddGroupScreen> {
       params['post_id'] = widget.item!.id;
     }
 
-    if (currentCity != null && currentCity != 0) {
+    if (currentCity != null && currentCity != 0 && widget.item == null) {
       for (var cityData in loadCitiesResponse!) {
         if (cityData['id'] == currentCity) {
           selectedCity = cityData['name'];
@@ -234,6 +234,9 @@ class _AddGroupScreenState extends State<AddGroupScreen> {
                 onChange: (result) {
                   setState(() {
                     isImageChanged = true;
+                    if (widget.item != null && widget.item?.id != null) {
+                      _featureImage = result.first.path;
+                    }
                   });
                 },
               ),
